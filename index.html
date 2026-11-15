@@ -1,0 +1,2974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Horizon-X | NASA Space Mission Design Game</title>
+  <!-- Google Fonts Fallback for Tektur -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tektur:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Three.js Library & Loaders (Draco, GLTF, STL) for 3D FPS Facility Room -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="assets/js/DRACOLoader.js"></script>
+  <script>
+    if (typeof THREE !== 'undefined' && !THREE.DRACOLoader) {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"><\/script>');
+    }
+  </script>
+  <script src="assets/js/GLTFLoader.js"></script>
+  <script>
+    if (typeof THREE !== 'undefined' && !THREE.GLTFLoader) {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"><\/script>');
+    }
+  </script>
+  <script src="assets/js/STLLoader.js"></script>
+  <!-- Embedded Real NASA Hubble GLB Data (Ensures 100% original textures load even without network) -->
+  <script src="assets/js/hubbleGlbData.js?v=7.29"></script>
+  <!-- Embedded ReadyPlayerMe 3D Character Avatar Data (Zero-latency instant spawn on both Firebase & Vercel) -->
+  <script src="assets/js/avatarGlbData.js?v=7.29"></script>
+  <link rel="stylesheet" href="style.css?v=7.29">
+</head>
+<body>
+
+  <!-- =========================================================================
+       SCREEN 1: MAIN MENU (Figma Node 378:2)
+       ========================================================================= -->
+  <section class="game-screen active" id="mainMenuScreen" data-node-id="378:2">
+    <!-- Nebula Starfield Layer -->
+    <div class="bg-nebula-container" aria-hidden="true">
+      <img src="assets/images/download (10) 1.png" alt="Cosmic Nebula" class="bg-nebula-img">
+    </div>
+
+    <!-- Saturn Planet Layer -->
+    <div class="bg-saturn-container" aria-hidden="true">
+      <img src="assets/images/Saturne 1.png" alt="Saturn" class="bg-saturn-img">
+    </div>
+
+    <!-- Ambient Overlay -->
+    <div class="ambient-overlay" aria-hidden="true"></div>
+
+    <!-- NASA Operator Profile Badge (Top Right) -->
+    <div class="main-menu-auth-badge" id="mainMenuAuthBadge">
+      <div class="operator-profile-card" id="operatorProfileCard">
+        <div class="operator-avatar" id="operatorAvatarEl">👨‍🚀</div>
+        <div class="operator-meta">
+          <span class="operator-rank" id="operatorRankTag">ASTRONAUT CALL SIGN</span>
+          <span class="operator-name" id="operatorNameDisplay">Astronaut</span>
+        </div>
+        <button class="btn-operator-edit" id="btnOpenAuthModal" title="Change Name or Sign In">
+          CHANGE / LOGIN
+        </button>
+      </div>
+    </div>
+
+    <!-- Center Content -->
+    <div class="menu-content">
+      <h1 class="game-title">Horizon-X</h1>
+      <nav class="menu-nav" aria-label="Main Navigation">
+        <button class="menu-item menu-continue-btn" id="btnContinue" data-action="continue" disabled>
+          <span>Continue</span>
+          <span class="continue-badge hidden" id="continueBadge">AUTO-SAVED</span>
+        </button>
+        <button class="menu-item" id="btnStart" data-action="start">Start</button>
+        <button class="menu-item" id="btnRoom" data-action="room">Room</button>
+        <button class="menu-item" id="btnSettings" data-action="settings">Settings</button>
+      </nav>
+    </div>
+
+    <!-- Footers -->
+    <footer class="menu-footer">
+      <span class="footer-tag footer-credits">Made By ZeninXParth</span>
+      <span class="footer-tag footer-tagline">Nasa Space Design Game</span>
+    </footer>
+  </section>
+
+  <!-- =========================================================================
+       SCREEN 2: ROOM SCREEN (Figma Node 378:46)
+       ========================================================================= -->
+  <section class="game-screen" id="roomScreen" data-node-id="378:46">
+    <!-- Starfield Background -->
+    <div class="room-starfield-container" aria-hidden="true">
+      <img src="assets/images/download (9) 1.png" alt="Starfield" class="room-starfield-img">
+    </div>
+
+    <div class="room-layout">
+      <!-- Title: Room -->
+      <h1 class="room-title">Room</h1>
+
+      <!-- Section: Join Game -->
+      <div class="room-group">
+        <label class="room-label" for="joinPlayerNameInput">Your Name (Call Sign)</label>
+        <div class="room-input-box">
+          <input type="text" id="joinPlayerNameInput" class="room-input" placeholder="ENTER YOUR ASTRONAUT NAME (e.g. Parth / Abhijeet)" maxlength="24" autocomplete="off">
+        </div>
+      </div>
+
+      <!-- Section: Join Game -->
+      <div class="room-group">
+        <h2 class="room-label">Join Game</h2>
+        <div class="room-input-box">
+          <input type="text" id="joinGameInput" class="room-input" placeholder="ENTER ROOM CODE (e.g. ARTEMIS-3)" spellcheck="false" autocomplete="off">
+          <button id="joinGameSubmitBtn" class="room-icon-btn" aria-label="Join Game">
+            <svg class="room-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+        <div class="room-input-box" style="margin-top: 12px;">
+          <input type="text" id="joinGamePasscode" autocomplete="off" autocorrect="off" autocapitalize="off" class="room-input" placeholder="ENTER PASSCODE (IF REQUIRED)" spellcheck="false" autocomplete="off">
+        </div>
+        <div id="joinRoomError" class="room-error-msg hidden"></div>
+      </div>
+
+      <!-- Action: Create the Private room -->
+      <button class="room-action-link" id="btnOpenPrivateRoom">
+        Create the Private room
+      </button>
+
+      <!-- Action: Back -->
+      <button class="room-back-btn" id="btnRoomBack">
+        Back
+      </button>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       SCREEN 3: CREATE THE PRIVATE ROOM SCREEN (Figma Node 378:72)
+       ========================================================================= -->
+  <section class="game-screen" id="pRoomScreen" data-node-id="378:72">
+    <!-- Starfield Background -->
+    <div class="room-starfield-container" aria-hidden="true">
+      <img src="assets/images/download (9) 1.png" alt="Starfield" class="room-starfield-img">
+    </div>
+
+    <div class="proom-layout">
+      <!-- Title: Create the Private room -->
+      <h1 class="proom-title">Create the Private room</h1>
+
+      <!-- Parameter 0: Your Name -->
+      <div class="proom-group">
+        <label class="proom-label" for="createPlayerNameInput">Your Name (Call Sign)</label>
+        <div class="room-input-box">
+          <input type="text" id="createPlayerNameInput" class="room-input" placeholder="ENTER YOUR ASTRONAUT NAME (e.g. Parth / Abhijeet)" maxlength="24" autocomplete="off">
+        </div>
+      </div>
+
+      <!-- Parameter 1: Room Code -->
+      <div class="proom-group">
+        <label class="proom-label" for="roomCodeField">Room Code</label>
+        <div class="room-input-box">
+          <input type="text" id="roomCodeField" class="room-input" value="ARTEMIS-3" spellcheck="false" autocomplete="off">
+          <button id="btnRefreshRoomCode" class="room-icon-btn" title="Generate New Room Code" aria-label="Refresh Room Code">
+            <svg class="room-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Parameter 2: Passcode -->
+      <div class="proom-group">
+        <label class="proom-label" for="passcodeField">Passcode (Optional)</label>
+        <div class="room-input-box">
+          <input type="text" id="passcodeField" class="room-input" value="NASA-2026" spellcheck="false">
+          <button id="btnRefreshPasscode" class="room-icon-btn" title="Regenerate Passcode" aria-label="Refresh Passcode">
+            <svg class="room-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Parameter 3: No of Players -->
+      <div class="proom-group">
+        <span class="proom-label">No of Players</span>
+        <div class="room-input-box player-counter-box">
+          <button id="btnPlayerDec" class="room-icon-btn counter-arrow-btn" aria-label="Decrease Players">
+            <svg class="room-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </button>
+          <span id="playerCountDisplay" class="player-count-val">4</span>
+          <button id="btnPlayerInc" class="room-icon-btn counter-arrow-btn" aria-label="Increase Players">
+            <svg class="room-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 5"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Action: Launch Private Room -->
+      <button class="room-action-btn primary" id="btnLaunchPrivateRoom">
+        LAUNCH PRIVATE ROOM
+      </button>
+      <div id="createRoomError" class="room-error-msg hidden"></div>
+
+      <!-- Action: Back -->
+      <button class="room-back-btn" id="btnPRoomBack">
+        Back
+      </button>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       SCREEN 4: SETTINGS SCREEN (Figma Node 378:131)
+       ========================================================================= -->
+        <section class="game-screen" id="settingsScreen" data-node-id="378:131">
+    <!-- Starfield Background -->
+    <div class="room-starfield-container" aria-hidden="true">
+      <img src="assets/images/download (9) 1.png" alt="Starfield" class="room-starfield-img">
+    </div>
+
+    <!-- Exact Responsive Figma Node 378:131 Settings -->
+    <div class="settings-layout figma-node-378-131">
+      <!-- Title: Settings (Node 378:132) -->
+      <h1 class="settings-title figma-title-378">Settings</h1>
+
+      <!-- Player Name (Node 378:224) -->
+      <div class="figma-player-name-section">
+        <label class="settings-label figma-label-378" for="settingPlayerName">Player Name</label>
+        <div class="settings-input-box figma-input-box-378">
+          <input type="text" id="settingPlayerName" class="settings-input figma-input-378" value="Player_0223" spellcheck="false">
+        </div>
+      </div>
+
+      <!-- Audio Toggle (Node 495:201) -->
+      <div class="figma-audio-section">
+        <span class="settings-label figma-label-378">Audio</span>
+        <button type="button" id="settingAudioToggle" class="figma-audio-toggle" aria-label="Toggle Audio">
+          <span class="figma-audio-knob"></span>
+          <span id="settingAudioDot" class="settings-audio-dot dot-off" style="display: none;"></span>
+          <span id="settingAudioStatusText" style="display: none;">AUDIO: DISABLED (CLICK TO ENABLE)</span>
+        </button>
+      </div>
+
+      <!-- 2-Column Responsive Sliders (Nodes 495:199 & 495:200) -->
+      <div class="figma-settings-columns">
+        <!-- Left Column: Master Volume, Instrument Volume, Brightness (Node 495:199) -->
+        <div class="figma-slider-col">
+          <!-- Master Volume (Node 378:220) -->
+          <div class="settings-group figma-slider-item">
+            <label class="settings-label figma-label-378" for="sliderMasterVolume">Master Volume</label>
+            <div class="settings-slider-wrapper figma-slider-wrap">
+              <input type="range" id="sliderMasterVolume" class="figma-range-slider" min="0" max="100" value="80" aria-label="Master Volume">
+            </div>
+          </div>
+
+          <!-- Instrument Volume (Node 378:223) -->
+          <div class="settings-group figma-slider-item">
+            <label class="settings-label figma-label-378" for="sliderInstrumentVolume">Instrument Volume</label>
+            <div class="settings-slider-wrapper figma-slider-wrap">
+              <input type="range" id="sliderInstrumentVolume" class="figma-range-slider" min="0" max="100" value="80" aria-label="Instrument Volume">
+            </div>
+          </div>
+
+          <!-- Brightness (Node 492:5) -->
+          <div class="settings-group figma-slider-item">
+            <label class="settings-label figma-label-378" for="sliderBrightness">Brightness (<span id="brightnessValText">50%</span>)</label>
+            <div class="settings-slider-wrapper figma-slider-wrap">
+              <input type="range" id="sliderBrightness" class="figma-range-slider" min="25" max="80" value="50" aria-label="Brightness">
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Horizontal Sensitivity, Vertical Sensitivity (Node 495:200) -->
+        <div class="figma-slider-col">
+          <!-- Horizontal Sensitivity (Node 378:221) -->
+          <div class="settings-group figma-slider-item">
+            <label class="settings-label figma-label-378" for="sliderHorizSens">Horizontal Sensitivity</label>
+            <div class="settings-slider-wrapper figma-slider-wrap">
+              <input type="range" id="sliderHorizSens" class="figma-range-slider" min="1" max="100" value="80" aria-label="Horizontal Sensitivity">
+            </div>
+          </div>
+
+          <!-- Vertical Sensitivity (Node 378:222) -->
+          <div class="settings-group figma-slider-item">
+            <label class="settings-label figma-label-378" for="sliderVertSens">Vertical Sensitivity</label>
+            <div class="settings-slider-wrapper figma-slider-wrap">
+              <input type="range" id="sliderVertSens" class="figma-range-slider" min="1" max="100" value="80" aria-label="Vertical Sensitivity">
+            </div>
+          </div>
+
+          <!-- Mission Operations & Directives Utility Bar -->
+          <div class="figma-aux-section">
+            <div class="settings-difficulty-row" style="margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <button type="button" class="target-diff-btn active" id="btnDiffApprentice" data-diff="apprentice" title="Step-by-step guidance and simplified aerospace terms for students">
+                  <span class="diff-icon">🎓</span>
+                  <span class="diff-text">LEVEL 1: APPRENTICE (AGE 13+)</span>
+                </button>
+                <button type="button" class="target-diff-btn" id="btnDiffEngineer" data-diff="engineer" title="Standard flight tolerance and full telemetry control">
+                  <span class="diff-icon">⚙️</span>
+                  <span class="diff-text">LEVEL 2: FLIGHT ENGINEER</span>
+                </button>
+              </div>
+              <div class="figma-aux-buttons-row">
+              <button type="button" id="btnSettingsRestartMission" class="figma-aux-btn restart-mission-btn" title="Reset mission data">
+                <span>RESTART MISSION</span>
+              </button>
+              <button type="button" id="btnSettingsQuitMenu" class="figma-aux-btn quit-mission-btn" title="Quit to main menu">
+                <span>QUIT TO MENU</span>
+              </button>
+              <button type="button" id="btnToggleControlsGuide" class="figma-aux-btn" title="Toggle Facility Controls Reference">
+                <span>KEYBINDINGS [?]</span>
+              </button>
+            </div>
+
+            <!-- Controls Table (Hidden Drawer) -->
+            <div class="settings-controls-table-wrap figma-controls-drawer hidden" id="settingsControlsDrawer">
+              <table class="settings-controls-table" id="settingsControlsTable">
+                <thead>
+                  <tr>
+                    <th>CONTROL KEY</th>
+                    <th>ACTION / FLIGHT DIRECTIVE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd></td><td>Navigate Facility / Move</td></tr>
+                  <tr><td><kbd>Mouse / Drag</kbd></td><td>360° Inspection &amp; Look</td></tr>
+                  <tr><td><kbd>Shift</kbd></td><td>Sprint / High-Speed Walk</td></tr>
+                  <tr><td><kbd>E</kbd></td><td>Interact with Terminals &amp; Workbenches</td></tr>
+                  <tr><td><kbd>V</kbd></td><td>Toggle 1st Person / 3rd Person Camera</td></tr>
+                  <tr><td><kbd>M</kbd></td><td>Toggle Radio Microphone</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Back Button (Node 378:133) -->
+      <button class="settings-back-btn figma-back-378" id="btnSettingsBack">
+        Back
+      </button>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       SCREEN: TARGET SELECTION & MISSIONS (Figma Node 504:60 "OBSERVATOY")
+       ========================================================================= -->
+  <section class="game-screen" id="missionsScreen" data-node-id="504:60">
+    <!-- Starfield Background matching Figma 504:63 -->
+    <div class="room-starfield-container" aria-hidden="true">
+      <img src="assets/images/download (9) 1.png" alt="Starfield" class="room-starfield-img">
+    </div>
+
+    <div class="target-selection-layout figma-node-504-60">
+      <!-- Top Title: Select the Observatory (Node 504:61) -->
+      <div class="target-header-block">
+        <h1 class="target-title figma-title-504" data-node-id="504:61">Select the Observatory</h1>
+
+        
+      </div>
+
+      <!-- 3-Column Responsive Observatory Targets Grid (Figma Node 504:60) -->
+      <div class="target-grid-3col figma-observatory-grid">
+        <!-- Target 1: Hubble Space Telescope (Active Playable Campaign) -->
+        <div class="target-card-figma active-target" id="targetCardHubble" role="button" tabindex="0" aria-label="Select Hubble Space Telescope: Exploring Deep Space Science">
+          <p class="target-card-subtitle" data-node-id="504:88">Exploring Deep Space Science</p>
+          <div class="target-card-image-wrap" data-node-id="504:83">
+            <img src="assets/images/target_hubble.jpeg" alt="Hubble Space Telescope" class="target-card-img">
+            <div class="target-hover-overlay">
+              <span class="target-action-label">ENTER FACILITY</span>
+            </div>
+          </div>
+          <h2 class="target-card-name" data-node-id="504:86">Hubble Space Telescope</h2>
+          <button type="button" class="target-action-btn primary sr-only-action" id="btnSelectHubble" tabindex="-1">
+            <span>START MISSION</span>
+          </button>
+        </div>
+
+        <!-- Target 2: James Webb Space Telescope (Scheduled for Phase 6) -->
+        <div class="target-card-figma locked-target" id="targetCardJwst" role="button" tabindex="0" aria-label="James Webb Space Telescope: Exploring Exoplanets (Locked for Phase 6)">
+          <p class="target-card-subtitle" data-node-id="504:99">Exploring Exoplanets</p>
+          <div class="target-card-image-wrap" data-node-id="504:84">
+            <img src="assets/images/target_jwst.jpeg" alt="James Webb Space Telescope" class="target-card-img">
+            <div class="target-hover-overlay">
+              <span class="target-action-label">PHASE 6 DEPLOYMENT</span>
+            </div>
+          </div>
+          <h2 class="target-card-name" data-node-id="504:98">James Web Telescope</h2>
+          <button type="button" class="target-action-btn locked sr-only-action" id="btnSelectJwst" tabindex="-1">
+            <span>LOCKED</span>
+          </button>
+        </div>
+
+        <!-- Target 3: Chandra X-Ray Observatory (Scheduled for Phase 6) -->
+        <div class="target-card-figma locked-target" id="targetCardChandra" role="button" tabindex="0" aria-label="Chandra X-ray Observatory: Exploring high-energy X-rays (Locked for Phase 6)">
+          <p class="target-card-subtitle" data-node-id="504:103">Exploring high-energy X-rays</p>
+          <div class="target-card-image-wrap" data-node-id="504:85">
+            <img src="assets/images/target_chandra.jpeg" alt="Chandra X-Ray Observatory" class="target-card-img">
+            <div class="target-hover-overlay">
+              <span class="target-action-label">PHASE 6 DEPLOYMENT</span>
+            </div>
+          </div>
+          <h2 class="target-card-name" data-node-id="504:102">Chandra X-ray Observatory</h2>
+          <button type="button" class="target-action-btn locked sr-only-action" id="btnSelectChandra" tabindex="-1">
+            <span>LOCKED</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Back Action Button (Node 504:62) -->
+      <button class="target-back-btn figma-back-504" id="btnMissionsBack" data-node-id="504:62">Back</button>
+    </div>
+  </section>
+
+
+  <!-- =========================================================================
+       SCREEN: OBJECTIVE (Figma Node 391:60 "obj-03")
+       ========================================================================= -->
+  <section class="game-screen" id="objectiveScreen" data-node-id="391:60">
+    <div class="room-starfield-container" aria-hidden="true">
+      <img src="assets/images/download (9) 1.png" alt="Starfield" class="room-starfield-img">
+    </div>
+
+    <div class="objective-layout figma-node-391-60">
+      <!-- Title: Objective (Node 391:61) -->
+      <h1 class="objective-title figma-title-391" data-node-id="391:61">Objective</h1>
+
+      <!-- Mission Target Name (Node 504:110) -->
+      <h2 class="objective-target-name figma-target-504" data-node-id="504:110">Hubble Space Telescope</h2>
+
+      <!-- Main Briefing Content (Node 504:112) -->
+      <div class="objective-content figma-briefing-504" data-node-id="504:112">
+        <p class="objective-lead">
+          You are assigned to the NASA Hubble Facility to service the Hubble Space Telescope subsystems. As a systems engineer, your workflow follows authentic NASA protocol: walk up to either <strong>Desk 01 (Mechanical)</strong>, <strong>Desk 02 (Electronic )</strong> or <strong>Desk 03 (Network)</strong> with your Friends and check in at the Computer Terminal. Check-in authorizes your station terminal, activates your department tasks, and connects your tool requisition frame.
+        </p>
+        <ul class="objective-specs-list">
+          <li><strong>Target:</strong> Repair &amp; examine the working and Grasp the experience</li>
+          <li><strong>Allocated Budget:</strong> $150,000.00</li>
+        </ul>
+      </div>
+
+      <!-- Footer Action Buttons (Node 391:62 & Node 391:63) -->
+      <div class="objective-footer-actions figma-actions-391">
+        <button type="button" class="obj-action-btn figma-btn-prev" id="btnObjectivePrev" data-node-id="391:62">Previous</button>
+        <button type="button" class="obj-action-btn figma-btn-start" id="btnObjectiveStart" data-node-id="391:63">Start</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Smooth Cinematic Transition Overlay -->
+  <div id="facilityTransitionOverlay" class="facility-transition-overlay" aria-hidden="true"></div>
+
+  <!-- =========================================================================
+       SCREEN 5: 3D FPS FACILITY ROOM (Figma Node 391:75 + 401:8)
+       ========================================================================= -->
+  <section class="game-screen" id="facilityScreen" data-node-id="391:75">
+    <div id="facility3dCanvasContainer" class="facility-canvas-container"></div>
+
+    <!-- HUD Overlay -->
+    <div class="fps-hud">
+      <!-- Lobby Multiplayer Waiting for Players Status Pill (Node 505 / Phase 5 Specification) -->
+      <div class="lobby-waiting-status-banner hidden" id="lobbyWaitingStatusBanner">
+        <span class="status-radar-ping"></span>
+        <span id="lobbyWaitingStatusText">WAITING FOR PLAYERS [1/4]</span>
+      </div>
+      <!-- Top Sci-Fi Cyan Framing Banner -->
+      <div class="fps-frame-top-accent">
+        <div class="accent-bar-left"></div>
+        <div class="accent-tab-cut"></div>
+        <div class="accent-bar-right"></div>
+      </div>
+
+      <!-- Crosshair -->
+      <div class="fps-crosshair" aria-hidden="true"></div>
+
+      <!-- Top Info Bar (Figma Node 375:66 Specification) -->
+      <div class="fps-top-bar node-375-frame">
+        <div class="top-bar-left-accent"></div>
+        <div class="top-bar-boxes-container">
+          <!-- Box 1: Player Name -->
+          <div class="hud-frame-box player-box" id="hudPlayerBox" title="Operator Call Sign">
+            <span class="hud-frame-val" id="hudOperatorNameDisplay">Player_003</span>
+          </div>
+
+          <!-- Box 2: Live Mission Timer -->
+          <div class="hud-frame-box timer-box" id="hudTimerBox" title="Mission Shift Elapsed Time">
+            <span class="hud-frame-val" id="hudMissionTimer">00 : 00 : 00</span>
+          </div>
+
+          <!-- Box 3: Budget Amount -->
+          <div class="hud-frame-box budget-box" id="hudBudgetBox" title="Remaining Mission Budget">
+            <span class="hud-frame-currency">$</span>
+            <span class="hud-frame-val" id="hudTopBudget">150000.00</span>
+          </div>
+
+          <!-- Camera Toggle Icon [V] -->
+          <button id="btnToggleCameraView" class="hud-frame-btn icon-box" title="Toggle 3rd Person Character Focus / 1st Person [V]" aria-label="Toggle Camera View">
+            <svg class="hud-frame-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+          </button>
+
+          <!-- Box 4: Settings Icon -->
+          <button id="btnFacilitySettings" class="hud-frame-btn icon-box" title="Game Settings" aria-label="Settings">
+            <svg class="hud-frame-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+
+          <!-- Box 5: Restart / Refresh Icon -->
+          <button id="btnFacilityRestart" class="hud-frame-btn icon-box" title="Restart Mission" aria-label="Restart Mission">
+            <svg class="hud-frame-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+            </svg>
+          </button>
+
+          <!-- Box 6: Close / Quit Icon with Confirmation -->
+          <button id="btnFacilityQuit" class="hud-frame-btn icon-box close-box" title="Exit Hubble Space Facility (Confirm to Leave)" aria-label="Exit Game">
+            <svg class="hud-frame-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Connected Players & Voice Activity Row (Right below Top Bar) -->
+      <div class="hud-connected-players-bar" id="hudConnectedPlayersBar" style="display: none !important;">
+        <div class="connected-player-slots" id="connectedPlayerSlots">
+          <span class="player-slot active" id="slotPlayer1" title="Engineer 1"><span class="slot-avatar">👤</span></span>
+          <span class="player-slot" id="slotPlayer2" title="Engineer 2"><span class="slot-avatar">👤</span></span>
+          <span class="player-slot" id="slotPlayer3" title="Engineer 3"><span class="slot-avatar">👤</span></span>
+          <span class="player-slot" id="slotPlayer4" title="Engineer 4"><span class="slot-avatar">👤</span></span>
+        </div>
+        <button id="btnVoiceMicToggle" class="voice-mic-pill muted" title="Toggle Voice Chat Microphone [M]" aria-label="Toggle Voice Mute">
+          <svg class="mic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+          <span class="mic-status-wave" id="micBreathWave"></span>
+        </button>
+      </div>
+
+      <!-- Center of Screen: Single Active Task Banner (Strictly NO multi-item list) -->
+            <!-- Sticky Assembly Passcodes Pinned HUD Widget (Figma 456:112 Integration) -->
+      <div class="hud-sticky-passcodes-bar hidden" id="stickyPasscodeHud" title="Earned Department Assembly Passcodes">
+        <div class="sticky-passcodes-header">
+          <span class="sticky-pin-icon">📌</span>
+          <span class="sticky-title">ASSEMBLY PASSCODES</span>
+        </div>
+        <div class="sticky-passcodes-chips">
+          <div class="sticky-chip locked" id="stickyChipMech" title="Mechanical Department Assembly Code">
+            <span class="chip-dept-tag">MECH</span>
+            <span class="chip-code-val" id="stickyValMech">LOCKED</span>
+          </div>
+          <div class="sticky-chip locked" id="stickyChipElec" title="Electronic Department Assembly Code">
+            <span class="chip-dept-tag">ELEC</span>
+            <span class="chip-code-val" id="stickyValElec">LOCKED</span>
+          </div>
+          <div class="sticky-chip locked" id="stickyChipNet" title="Network Department Assembly Code">
+            <span class="chip-dept-tag">NET</span>
+            <span class="chip-code-val" id="stickyValNet">LOCKED</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hud-center-task-container" id="hudCenterTaskContainer">
+        <span class="hud-center-task-text" id="hudCenterTaskText">Tasks Appear Here</span>
+      </div>
+
+      <!-- Controls Overlay (Hidden from HUD, Moved to Settings Modal per Node 375:66 Specification) -->
+      <div class="hud-controls-card hidden" id="hudControlsCard" style="display: none !important;">
+        <h4 class="hud-controls-title">Controls</h4>
+      </div>
+
+      <!-- Mission & Tasks Checklist (Legacy container preserved hidden for state listeners) -->
+      <div class="hud-mission-panel hidden" style="display: none !important;">
+        <div class="hud-active-dept-display" id="hudActiveDeptDisplay">
+          <span class="dept-dot">●</span>
+          <span id="hudActiveDeptTitle">DEPARTMENT: PENDING CHECK-IN</span>
+        </div>
+        <h3 class="hud-main-task-text" id="hudMainTaskText">[MAIN TASK]: Take control of the Electronic Department</h3>
+        <h4 class="hud-sub-task-text" id="hudSubTaskText">DF-224 Main Computer & FGS Electronics Calibration</h4>
+        
+        <!-- Electronic Department Checklist (Default Active) -->
+        <div class="hud-checklist" id="hudChecklistElec">
+          <div class="hud-check-item" id="chkCheckInElec">
+            <span class="check-label">Check-in Electronic Dep:</span>
+            <span class="check-icon" id="chkCheckInElecIcon">○</span>
+          </div>
+          <div class="hud-check-item" id="chkPapersElec">
+            <span class="check-label">Check Electrical Notes:</span>
+            <span class="check-icon" id="chkPapersElecIcon">○</span>
+          </div>
+          <div class="hud-check-item" id="chkSubtaskE01">
+            <span class="check-label">[SUB-E-01] DF-224 Computer:</span>
+            <span class="check-icon" id="chkSubtaskE01Icon">○</span>
+          </div>
+          <div class="hud-check-item" id="chkSubtaskE02">
+            <span class="check-label">[SUB-E-02] FGS Calibration:</span>
+            <span class="check-icon" id="chkSubtaskE02Icon">○</span>
+          </div>
+          <div class="hud-check-item" id="chkDiagElec">
+            <span class="check-label">Power & Telemetry Check-Out:</span>
+            <span class="check-icon" id="chkDiagElecIcon">○</span>
+          </div>
+        </div>
+
+        <!-- Mechanical Department Checklist (Friend's Tasks) -->
+        <div class="hud-checklist hidden" id="hudChecklistMech">
+          <div class="hud-check-item" id="chkCheckIn">
+            <span class="check-label">Check-in Mechanical Dep:</span>
+            <span class="check-icon" id="chkCheckInIcon">○</span>
+          </div>
+          <div class="hud-check-item" id="chkAssembleReport">
+            <span class="check-label">Check the Assemble report:</span>
+            <span class="check-icon" id="chkReportIcon">○</span>
+          </div>
+          <div class="hud-check-item" id="chkGyroAssembly">
+            <span class="check-label">Mount & Torque Gyro Module:</span>
+            <span class="check-icon" id="chkGyroIcon">○</span>
+          </div>
+          <div class="hud-check-item" id="chkSadmAssembly">
+            <span class="check-label">Service & Latch SADM Drive:</span>
+            <span class="check-icon" id="chkSadmIcon">○</span>
+          </div>
+        </div>
+
+        <!-- Network Department Checklist (Desk 03 - South Wall) -->
+        <div class="hud-checklist hidden" id="hudChecklistNet">
+          <div class="hud-check-item" id="chkCheckInNet">
+            <span class="check-label">Check-in Network Dep:</span>
+            <span class="check-icon" id="chkCheckInNetIcon">○</span>
+          </div>
+          <div class="hud-check-item" id="chkPapersNet">
+            <span class="check-label">Check RF & Comm Notes:</span>
+            <span class="check-icon" id="chkPapersNetIcon">○</span>
+          </div>
+          <div class="hud-check-item" id="chkSubtaskN01">
+            <span class="check-label">[SUB-N-01] HGA Realignment:</span>
+            <span class="check-icon" id="chkSubtaskN01Icon">○</span>
+          </div>
+          <div class="hud-check-item" id="chkSubtaskN02">
+            <span class="check-label">[SUB-N-02] Fiber Bus Splicing:</span>
+            <span class="check-icon" id="chkSubtaskN02Icon">○</span>
+          </div>
+          <div class="hud-check-item" id="chkDiagNet">
+            <span class="check-label">TDRSS Link & Comm Check-Out:</span>
+            <span class="check-icon" id="chkDiagNetIcon">○</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- The Player's Frame (Bottom Right - Equipped Tools) -->
+      <div class="player-instruments-frame" id="playerInstrumentsFrame">
+        <div class="player-frame-dept-pills" id="playerFrameDeptPills">
+          <button class="frame-dept-pill active" id="pillFrameMech" title="Switch to Desk 01 Mechanical Frame">DESK 01: MECH <span class="pill-count" id="pillCountMech">[0/5]</span></button>
+          <button class="frame-dept-pill" id="pillFrameElec" title="Switch to Desk 02 Electrical Frame">DESK 02: ELEC <span class="pill-count" id="pillCountElec">[0/5]</span></button>
+          <button class="frame-dept-pill" id="pillFrameNet" title="Switch to Desk 03 Network Frame">DESK 03: NET <span class="pill-count" id="pillCountNet">[0/5]</span></button>
+        </div>
+        <!-- Phase 3 Keycard Inventory Badge -->
+        <div class="hud-keycard-badge hidden" id="hudKeycardBadge" title="NASA GSFC Security Access Keycard (STS-61 Facility Authorized)">
+          <img src="assets/images/key-card.png" alt="Security Keycard" class="keycard-badge-img">
+          <div class="keycard-badge-meta">
+            <span class="keycard-badge-title">ACCESS KEYCARD</span>
+            <span class="keycard-badge-status" id="hudKeycardBadgeStatus">AUTHORIZED [STS-61]</span>
+          </div>
+        </div>
+        <div class="player-frame-slots" id="playerFrameSlots">
+          <!-- Dynamically populated only when tools are equipped -->
+        </div>
+      </div>
+
+      <!-- Facility Controller Voiceover & Audio Transmission HUD (Bottom/Center) -->
+      <div class="facility-comms-overlay hidden" id="facilityCommsOverlay" style="display: none !important;">
+        <div class="comms-panel">
+          <div class="comms-header">
+            <div class="comms-signal">
+              <span class="signal-pulse"></span>
+              <span class="comms-ch">FACILITY CONTROLLER // COMMS CH-04</span>
+            </div>
+            <span class="comms-freq">FREQ: 142.85 MHz [ACTIVE]</span>
+          </div>
+          <div class="comms-body">
+            <div class="comms-icon-wrap">
+              <svg class="comms-mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="22"></line>
+              </svg>
+            </div>
+            <div class="comms-text-block">
+              <div class="comms-sender">CHIEF FLIGHT CONTROLLER (GSFC)</div>
+              <div class="comms-dialogue" id="commsDialogueText">
+                "You are assigned to repair and assemble the minor parts of the Hubble Space Telescope"
+              </div>
+            </div>
+          </div>
+          <div class="comms-footer">
+            <span class="comms-progress" id="commsProgressText">TRANSMISSION 1 / 3</span>
+            <div class="comms-actions">
+              <button class="comms-action-btn" id="btnCommsNext">NEXT [SPACE]</button>
+              <button class="comms-action-btn comms-skip" id="btnCommsSkip">SKIP</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center Click to Focus Prompt -->
+      <div id="hudLockPrompt" class="fps-center-prompt">
+        <p class="fps-prompt-title">CLICK SCREEN OR DRAG TO LOOK AROUND</p>
+        <p class="fps-prompt-sub">[WASD / ARROW KEYS] Walk | [MOUSE / DRAG] 360° Look | [SHIFT] Sprint</p>
+      </div>
+
+      <!-- Context Interaction Prompt (Dynamic per object) -->
+      <div id="hudInteractionPrompt" class="fps-interaction-prompt">
+        <span class="fps-key-pill">E</span>
+        <span id="interactionPromptLabel">ACCESS MISSION CONSOLE</span>
+      </div>
+
+      <!-- Calm Center Pointer Alert Notification -->
+      <div id="hudCenterCalmAlert" class="hud-center-calm-alert hidden" aria-live="assertive">
+        <div class="calm-alert-box">
+          <div class="calm-alert-badge">
+            <span class="calm-alert-icon" id="calmAlertIcon">🛡️</span>
+            <span class="calm-alert-title" id="calmAlertTitle">SECURITY PROTOCOL</span>
+          </div>
+          <div class="calm-alert-msg" id="calmAlertMsg">Please check in at the Computer Terminal first.</div>
+        </div>
+      </div>
+
+      <!-- Dedicated Security / Keycard HUD Banner -->
+      <div id="hudSecurityBanner" class="hud-security-banner hidden" aria-live="assertive">
+        ACCESS VERIFICATION
+      </div>
+      <!-- HUD Science Camera Optical PiP Card (Option A: Visual Telemetry) -->
+      <div class="hud-science-cam-card hidden" id="hudScienceCamCard" style="display: none !important;">
+        <div class="science-cam-header">
+          <div class="science-cam-badge">
+            <span class="science-pulse-dot" id="scienceHudDot"></span>
+            <span class="science-cam-tag">LIVE OPTICAL TELEMETRY</span>
+          </div>
+          <span class="science-target-code">M100 // NGC 4321</span>
+        </div>
+        <div class="science-cam-preview-frame" id="hudScienceCamPreview">
+          <img src="assets/images/hubble_m100_telemetry.svg" alt="Hubble M100 Telemetry" class="science-preview-img" id="hudSciencePreviewImg">
+          <div class="science-cam-scanline-overlay"></div>
+          <div class="science-cam-hud-reticle">
+            <span class="reticle-corner tl"></span>
+            <span class="reticle-corner tr"></span>
+            <span class="reticle-corner bl"></span>
+            <span class="reticle-corner br"></span>
+            <span class="reticle-center-cross">+</span>
+          </div>
+          <span class="science-cam-status-overlay" id="hudScienceStatusText">SPHERICAL ABERRATION</span>
+        </div>
+        <div class="science-cam-metrics-row">
+          <div class="science-metric-item">
+            <span class="metric-label">PSF FWHM:</span>
+            <span class="metric-val" id="hudScienceFwhm">1.400"</span>
+          </div>
+          <div class="science-metric-item">
+            <span class="metric-label">RESOLUTION:</span>
+            <span class="metric-val highlight" id="hudScienceRes">0.720"</span>
+          </div>
+        </div>
+        <button type="button" class="science-cam-inspect-btn" id="btnOpenScienceModal">
+          <svg class="science-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <line x1="11" y1="8" x2="11" y2="14"></line>
+            <line x1="8" y1="11" x2="14" y2="11"></line>
+          </svg>
+          <span>OPTICAL ANALYSIS [E]</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       SCREEN 6: STS-31 LAUNCH & LEO SIMULATION (Phase 4)
+       ========================================================================= -->
+  <section class="game-screen" id="simulationScreen" aria-label="STS-31 Space Shuttle Launch to LEO Simulation">
+    <div class="simulation-viewport">
+      <!-- Full-bleed Canvas for Atmosphere, Launch Tower, Shuttle Stack & Hubble LEO Deployment -->
+      <canvas id="simulationCanvas" class="simulation-canvas" aria-label="STS-31 Simulation Canvas"></canvas>
+
+      <!-- Altitude Dashed Grid (Figma 463:863) -->
+      <div class="altitude-grid" aria-hidden="true">
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+      </div>
+
+      <!-- Top Telemetry HUD (Figma 463:863) -->
+      <header class="telemetry-hud" aria-label="STS-31 Mission Telemetry">
+        <!-- Left Cluster: Thrust, Velocity, Pressure -->
+        <div class="gauge-cluster gauge-cluster-left">
+          <div class="gauge-item">
+            <span class="gauge-title">Thrust</span>
+            <div class="gauge-circle">
+              <span class="gauge-value" id="valSimThrust">--</span>
+            </div>
+            <span class="gauge-unit">N</span>
+          </div>
+
+          <div class="gauge-item">
+            <span class="gauge-title">Velocity</span>
+            <div class="gauge-circle">
+              <span class="gauge-value" id="valSimVelocity">--</span>
+            </div>
+            <span class="gauge-unit">km/s</span>
+          </div>
+
+          <div class="gauge-item">
+            <span class="gauge-title">Pressure</span>
+            <div class="gauge-circle">
+              <span class="gauge-value" id="valSimPressure">--</span>
+            </div>
+            <span class="gauge-unit">kPa</span>
+          </div>
+        </div>
+
+        <!-- Center Mission Clock & Stage Metadata -->
+        <div class="mission-clock-panel">
+          <div class="mission-clock" id="valSimClock">00 : 00 : 00</div>
+          <div class="clock-divider" aria-hidden="true"></div>
+          <div class="mission-meta-row">
+            <div class="meta-col">
+              <span class="meta-label">Start</span>
+              <span class="meta-value" id="valSimStart">---</span>
+            </div>
+            <div class="meta-col">
+              <span class="meta-label">Next Stage</span>
+              <span class="meta-value" id="valSimNextStage">---</span>
+            </div>
+            <div class="meta-col">
+              <span class="meta-label">Duration</span>
+              <span class="meta-value" id="valSimDuration">---</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Cluster: Altitude, Downrange, Temperature -->
+        <div class="gauge-cluster gauge-cluster-right">
+          <div class="gauge-item">
+            <span class="gauge-title">Altitude</span>
+            <div class="gauge-circle">
+              <span class="gauge-value" id="valSimAltitude">--</span>
+            </div>
+            <span class="gauge-unit">km</span>
+          </div>
+
+          <div class="gauge-item">
+            <span class="gauge-title">Downrange</span>
+            <div class="gauge-circle">
+              <span class="gauge-value" id="valSimDownrange">--</span>
+            </div>
+            <span class="gauge-unit">km</span>
+          </div>
+
+          <div class="gauge-item">
+            <span class="gauge-title">Temperature</span>
+            <div class="gauge-circle">
+              <span class="gauge-value" id="valSimTemperature">--</span>
+            </div>
+            <span class="gauge-unit">°C</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Bottom-Left NASA GMAT R2026a Orbital Propagation & Telemetry Card -->
+      <aside class="gmat-telemetry-card" id="simGmatTelemetryCard" aria-label="NASA GMAT R2026a Orbital Propagation">
+        <div class="gmat-card-header">
+          <div class="gmat-badge-cluster">
+            <span class="gmat-logo-badge">NASA GMAT R2026a</span>
+            <span class="gmat-regime-pill" id="gmatOrbitRegime">LEO PROPAGATOR</span>
+          </div>
+          <span class="gmat-live-status" id="gmatLiveStatus">● EPHEMERIS ACTIVE</span>
+        </div>
+        <div class="gmat-card-title">GENERAL MISSION ANALYSIS TOOL</div>
+        <div class="gmat-grid">
+          <div class="gmat-stat">
+            <span class="gmat-stat-lbl">SEMI-MAJOR AXIS (a)</span>
+            <span class="gmat-stat-val" id="gmatSMA">6,971.5 km</span>
+          </div>
+          <div class="gmat-stat">
+            <span class="gmat-stat-lbl">INCLINATION (i)</span>
+            <span class="gmat-stat-val" id="gmatInc">28.47°</span>
+          </div>
+          <div class="gmat-stat">
+            <span class="gmat-stat-lbl">ECCENTRICITY (e)</span>
+            <span class="gmat-stat-val" id="gmatEcc">0.00028</span>
+          </div>
+          <div class="gmat-stat">
+            <span class="gmat-stat-lbl">ORBITAL PERIOD (T)</span>
+            <span class="gmat-stat-val" id="gmatPeriod">96.5 min</span>
+          </div>
+          <div class="gmat-stat">
+            <span class="gmat-stat-lbl">INTEGRATOR ALGORITHM</span>
+            <span class="gmat-stat-val">Runge-Kutta 8(9)</span>
+          </div>
+          <div class="gmat-stat">
+            <span class="gmat-stat-lbl">GRAVITY FIELD MODEL</span>
+            <span class="gmat-stat-val">JGM-3 (20x20)</span>
+          </div>
+        </div>
+        <div class="gmat-phase-banner" id="gmatTrajectoryPhase">
+          ASCENT INSERTION: STS-31 Space Shuttle Discovery to 593 km LEO
+        </div>
+      </aside>
+
+      <!-- Bottom-Right Fuel Ring Gauge (Figma 466:1166) -->
+      <aside class="fuel-widget" aria-label="External Tank Fuel Remaining">
+        <span class="fuel-title">Fuel</span>
+        <div class="fuel-ring-container">
+          <svg class="fuel-ring-svg" viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="fuel-ring-track" cx="100" cy="100" r="84" stroke-dasharray="475 528" />
+            <circle class="fuel-ring-progress" id="fuelRingArc" cx="100" cy="100" r="84" stroke-dasharray="475 528" />
+          </svg>
+          <span class="fuel-value" id="valSimFuel">-- %</span>
+        </div>
+      </aside>
+
+      <!-- Skip Button -->
+      <div class="sim-controls-overlay">
+        <button id="btnSkipSimulation" class="btn-sim-skip">SKIP TO MISSION DEBRIEF ⏩</button>
+      </div>
+
+      <!-- Launchpad & Ground Terrain -->
+      <div class="launchpad" aria-hidden="true"></div>
+      <div class="ground-container" aria-hidden="true">
+        <div class="ground-pill"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       SCREEN 7: MISSION COMPLETE ENDING PAGE (Figma Node 470:1373 & 470:1374)
+       ========================================================================= -->
+  <section class="game-screen" id="endingScreen" data-node-id="470:1373" aria-label="Mission Complete Screen">
+    <div class="ending-bg-layer" data-node-id="470:1374">
+      <img src="assets/images/mission_complete_nebula.png" class="ending-bg-img" alt="Mission Complete Space Nebula with Spacewalk Astronaut" />
+    </div>
+
+    <div class="ending-ui-overlay">
+      <!-- Top Brand & Header Actions -->
+      <header class="ending-top-bar">
+        <p class="ending-brand-title" data-node-id="470:1384">HORIZON-X</p>
+        <div class="ending-top-actions" data-node-id="470:1377">
+          <button class="ending-top-btn" id="btnEndingReplay" title="Replay Launch Simulation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+          </button>
+          <button class="ending-top-btn" id="btnEndingMenu" title="Return to Main Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Mission Complete Title & Synopsis -->
+      <div class="ending-hero-content">
+        <h1 class="ending-main-title" data-node-id="470:1388">Mission Complete</h1>
+        <p class="ending-synopsis" data-node-id="470:1389">
+          Mission accomplished. All primary objectives have been successfully completed. Resources secured, challenges overcome, and the destination reached.
+        </p>
+
+        <!-- Glassmorphic Contract Payout Table (Figma Node 470:1393) -->
+        <div class="ending-payout-box" data-node-id="470:1393">
+          <div class="payout-row">
+            <span class="payout-label" data-node-id="470:1395">Primary Mission Contract</span>
+            <span class="payout-val" data-node-id="470:1396">$ 75 M</span>
+          </div>
+          <div class="payout-row">
+            <span class="payout-label" data-node-id="470:1400">Precision Trajectory Bonus</span>
+            <span class="payout-val" data-node-id="470:1397">$ 15M</span>
+          </div>
+          <div class="payout-row">
+            <span class="payout-label" data-node-id="470:1401">Propellant Conservation Bonus</span>
+            <span class="payout-val" data-node-id="470:1398">$ 10M</span>
+          </div>
+          <div class="payout-row">
+            <span class="payout-label" data-node-id="470:1402">Rapid Calibration Bonus</span>
+            <span class="payout-val" data-node-id="470:1399">$ 5M</span>
+          </div>
+          <div class="payout-total-line" data-node-id="470:1403">
+            <span class="payout-total-label" data-node-id="470:1405">Total Max Payout</span>
+            <span class="payout-total-val" data-node-id="470:1404">$ 105M</span>
+          </div>
+        </div>
+
+        <!-- NASA Engineering Decision Audit & Mission Debriefing Report -->
+        <div class="ending-audit-box" id="endingDecisionAuditBox">
+          <div class="audit-box-header">
+            <div class="audit-header-badge">NASA GSFC FLIGHT CERTIFICATION AUDIT</div>
+            <h3 class="audit-header-title">WORKBENCH ENGINEERING DECISION REPORT</h3>
+            <div class="audit-score-row">
+              <span class="audit-score-pill" id="auditScorePill">FLIGHT SCORE: 100% [A+]</span>
+              <span class="audit-status-badge nominal" id="auditStatusBadge">ALL DIRECTIVES FLIGHT NOMINAL</span>
+            </div>
+          </div>
+          <div class="audit-directives-list" id="auditDirectivesList">
+            <!-- Dynamically populated from DecisionManager.calculateFlightAudit() -->
+          </div>
+
+          <!-- NASA Historical Mission Comparison Matcher Card -->
+          <div class="ending-mission-matcher-card" id="endingMissionMatcherCard">
+            <div class="matcher-header">
+              <span class="matcher-tag">NASA SPACE APPS 2026 // HISTORICAL MISSION MATCHER</span>
+              <span class="matcher-pct-badge">100% ARCHITECTURE MATCH</span>
+            </div>
+            <div class="matcher-body">
+              <div class="matcher-col-info">
+                <h4 class="matcher-mission-name">HUBBLE SPACE TELESCOPE (HST / STS-31)</h4>
+                <p class="matcher-desc">
+                  Your certified subsystem design perfectly mirrors NASA's flagship optical observatory. Deployed at 593 km LEO via Space Shuttle Discovery with Ritchey-Chrétien Cassegrain optics, twin high-gain S-band antennas, and beryllium-copper drive solar arrays.
+                </p>
+                <div class="matcher-specs-row">
+                  <span class="spec-pill"><strong>OPTICS:</strong> 2.4m Ritchey-Chrétien</span>
+                  <span class="spec-pill"><strong>ORBIT:</strong> 593 km LEO (28.47°)</span>
+                  <span class="spec-pill"><strong>PAYLOAD MASS:</strong> 11,110 kg</span>
+                  <span class="spec-pill"><strong>LIFESPAN:</strong> 34+ Years</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NASA GMAT Mission Analysis Certificate -->
+          <div class="ending-gmat-certificate" id="endingGmatCertificate">
+            <div class="cert-header">
+              <span class="cert-seal">🛰️ NASA GMAT R2026a CERTIFIED</span>
+              <span class="cert-epoch">EPOCH: J2000 // FLIGHT CLEARANCE</span>
+            </div>
+            <div class="cert-text">
+              GMAT Orbital Propagator verified: Trajectory nominal, zero inclination drift ($i=28.47^\circ$), circular orbit ($e=0.00028$), and adequate station-keeping margins. Approved by GSFC Mission Design Lab (MDL).
+            </div>
+          </div>
+        </div>
+
+        <!-- Action CTAs -->
+        <div class="ending-btn-row">
+          <button id="btnEndingReplayBottom" class="btn-ending-cta highlight">REPLAY LAUNCH SIMULATION 🚀</button>
+          <button id="btnEndingBackToFacility" class="btn-ending-cta secondary">RETURN TO HUBBLE FACILITY 🛰️</button>
+          <button id="btnEndingBackToMenu" class="btn-ending-cta primary">MAIN MENU 🏠</button>
+        </div>
+      </div>
+
+      <!-- Footer: Neil Armstrong Quote & Attribution -->
+      <footer class="ending-bottom-bar">
+        <div class="ending-quote-cluster">
+          <span class="nasa-meatball-tag">NASA</span>
+          <p class="ending-quote-text" data-node-id="470:1390">
+            “That’s one small step for a man, one giant leap for mankind.”
+          </p>
+        </div>
+        <div class="ending-author-cluster" data-node-id="470:1385">
+          <span class="author-label" data-node-id="470:1386">Made with</span>
+          <span class="author-team-name">ZeninXParth</span>
+        </div>
+      </footer>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       MODAL 0: LOBBY RECEPTION REGISTRATION & KEYCARD DISPENSER (Figma Node 505:114)
+       ========================================================================= -->
+  <div id="modalLobbyRegistration" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window modal-keycard-figma-505" data-node-id="505:114">
+      <button class="modal-close-btn-figma" id="btnCloseLobbyRegistrationModal" aria-label="Close Modal">&times;</button>
+
+      <!-- The Hubble Space Facility Access Card (Node 505:114) -->
+      <div class="keycard-card-surface" id="regKeycardPreview">
+        <img src="assets/images/Group 76.png" alt="Hubble Space Facility Access Card" class="keycard-card-img-figma">
+
+        <!-- Hidden overlay fields for script / test compatibility -->
+        <div style="display: none;" aria-hidden="true">
+          <form id="formLobbyRegistration">
+            <input type="text" id="regOperatorCallsign" value="Player_003">
+            <select id="regDepartmentSelect"><option value="electronic" selected></option></select>
+            <div id="regClearanceLevel"></div>
+          </form>
+          <span id="previewCallsign">CALLSIGN: ASTRONAUT</span>
+          <span id="previewDept">DEPT: FACILITY</span>
+          <span id="previewClearance">STATUS: AUTHORIZED</span>
+        </div>
+      </div>
+
+      <!-- Multiplayer Waiting Status Notice -->
+      <div id="modalWaitingPlayersNotice" class="modal-waiting-players-notice hidden">
+        WAITING FOR PLAYERS [1/4]
+      </div>
+
+      <!-- Action Button: Equip -->
+      <button type="button" class="btn-equip-keycard-figma" id="btnAuthorizeIssueKeycard">
+        Equip
+      </button>
+    </div>
+  </div>
+
+  =======
+       MODAL 1: COMPUTER CHECK-IN (Digital Session Sheet on Desk 01)
+       ========================================================================= -->
+  <div id="modalComputerSession" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window">
+      <div class="modal-header">
+        <div class="modal-badge-title">
+          <span class="modal-dot"></span>
+          <span>GSFC TERMINAL // SESSION REGISTRATION SHEET</span>
+        </div>
+        <button class="modal-close-btn" id="btnCloseComputerModal" aria-label="Close Modal">&times;</button>
+      </div>
+
+      <div class="modal-content">
+        <div class="session-sheet-form">
+          <div class="session-status-banner" id="sessionStatusBanner">
+            <span class="status-indicator-dot not-checked"></span>
+            <span id="sessionStatusLabel">STATUS: NOT CHECKED IN</span>
+          </div>
+
+          <div class="session-form-grid">
+            <div class="form-group">
+              <label>DATE & SYSTEM TIME</label>
+              <input type="text" id="sessionSheetClock" class="sheet-input-readonly" readonly value="--:--:-- UTC">
+            </div>
+
+            <div class="form-group">
+              <label>PROFESSION</label>
+              <input type="text" class="sheet-input-readonly" readonly value="Apprentice (Mechanical & Optical Subsystems)">
+            </div>
+
+            <div class="form-group">
+              <label>DEPARTMENT</label>
+              <input type="text" class="sheet-input-readonly" readonly value="Mechanical Department (Assemble / Repair / Read / Fix / Calibrate)">
+            </div>
+
+            <div class="form-group">
+              <label for="inputOperatorName">OPERATOR / APPRENTICE NAME</label>
+              <input type="text" id="inputOperatorName" class="sheet-input-editable" value="Engineer Apprentice" spellcheck="false">
+            </div>
+          </div>
+
+          <div class="session-log-card" id="sessionLogCard">
+            <div class="log-title">SESSION LOG SHEET</div>
+            <div class="log-row"><span>Assigned Duty:</span> <span>HST Minor Assemblies & Gyro Refurbishment</span></div>
+            <div class="log-row"><span>Supervising Division:</span> <span>NASA Goddard Space Flight Center</span></div>
+            <div class="log-row" id="sessionLogCheckinTime"><span>Check-in Timestamp:</span> <span>PENDING</span></div>
+            <div class="log-row" id="sessionLogDuration"><span>Active Working Duration:</span> <span>00:00:00</span></div>
+          </div>
+
+          <div class="session-actions-row">
+            <button class="session-btn btn-checkin" id="btnPerformCheckIn">CHECK IN</button>
+            <button class="session-btn btn-checkout disabled" id="btnPerformCheckOut" disabled>CHECK OUT</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 2: LAPTOP MARKETPLACE (Procurement on Desk 01)
+       ========================================================================= -->
+  <div id="modalLaptopMarket" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window modal-wide">
+      <div class="modal-header">
+        <div class="modal-badge-title">
+          <span class="modal-dot market-dot"></span>
+          <span>NASA TECHNICAL LOGISTICS & PROCUREMENT // APPRENTICE REQUISITION</span>
+        </div>
+        <button class="modal-close-btn" id="btnCloseLaptopModal" aria-label="Close Modal">&times;</button>
+      </div>
+
+      <div class="modal-content">
+        <div class="market-top-banner">
+          <div class="market-budget-box">
+            <span class="budget-label">REMAINING ALLOCATED BUDGET</span>
+            <span class="budget-value" id="marketRemainingBudget">$150,000</span>
+          </div>
+          <div class="market-info-note">
+            Procure only the necessary instruments and flight hardware specified in the research papers.
+          </div>
+        </div>
+
+        <div class="market-items-grid" id="marketItemsGrid">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 3: ASSEMBLY & RESEARCH PAPERS (Figma Node 414:44)
+       ========================================================================= -->
+  <div id="modalResearchPapers" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window modal-research-paper-figma">
+      <!-- Left NASA Blue Spine (Figma 414:31) -->
+      <div class="paper-left-spine">
+        <span class="spine-text">NASA // HST-SM1 TECH DIRECTIVE</span>
+      </div>
+
+      <!-- Right Document Sheet on Parchment Paper #fefae0 (Figma 414:30) -->
+      <div class="paper-doc-pane">
+        <!-- Close Button -->
+        <button class="paper-close-btn" id="btnClosePapersModal" aria-label="Close Modal">&times;</button>
+
+        <!-- Top Horizontal Navigation Tabs (Figma 414:32 - 414:37) -->
+        <nav class="paper-top-tabs" aria-label="Research Paper Sections">
+          <button class="paper-tab active" data-tab="tab-overview">Mission Overview</button>
+          <button class="paper-tab" data-tab="tab-gyro">Gyro Assembly</button>
+          <button class="paper-tab" data-tab="tab-sadm">Solar Drive (SADM)</button>
+          <button class="paper-tab" data-tab="tab-tools">Instrument Guide</button>
+          <button class="paper-tab" data-tab="tab-nasa-citations">NASA References</button>
+        </nav>
+
+        <!-- Document Pages Container -->
+        <div class="paper-pages-wrapper">
+          <!-- Page 1: Mission Overview (Figma 414:38 - 414:42) -->
+          <div class="paper-page active" id="tab-overview">
+            <h1 class="paper-doc-heading">Hubble Space Telescope Servicing & Assembly Directive</h1>
+            <div class="paper-meta-badge">AUTHOR: Senior Systems Engineering Group | REVISION: 4.2</div>
+            <p class="paper-p">
+              The Hubble Space Telescope is a 2.4-meter aperture optical observatory operating in Low Earth Orbit (LEO).
+              The main structural metering truss, primary hyperbolic mirror, and aperture light baffles have been fully fabricated and mounted by senior engineers.
+            </p>
+            <p class="paper-p">
+              <strong class="paper-strong">Apprentice Scope:</strong> Practical hands-on qualification requires the mechanical apprentice to install, torque, calibrate, and service the primary point-and-track precision units:
+            </p>
+            <div class="paper-scope-grid">
+              <div class="paper-scope-card">
+                <div class="scope-card-header">
+                  <span class="scope-tag">[SUB-TSK-M-01]</span>
+                  <span class="scope-title">RSU-02 Rate Gyroscope Canister</span>
+                </div>
+                <p class="scope-desc">Dual spinning-rotor inertial guidance sensor. Restores 0.007 arcsecond pointing stability for deep-sky observation.</p>
+              </div>
+              <div class="paper-scope-card">
+                <div class="scope-card-header">
+                  <span class="scope-tag">[SUB-TSK-M-02]</span>
+                  <span class="scope-title">SADM Solar Array Drive Mechanism</span>
+                </div>
+                <p class="scope-desc">Bi-stem hinge gearbox with viscoelastic thermal vibration dampers. Isolates violent day/night orbital temperature shocks.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Page 2: Gyro Assembly -->
+          <div class="paper-page" id="tab-gyro">
+            <h1 class="paper-doc-heading">SUB-TSK-M-01: Rate Sensor Unit (RSU-02) Manual</h1>
+            <div class="paper-meta-badge">PART: RSU-02 Dual-Wheel Canister | TARGET BAY: Aft Shroud Bay 2</div>
+            <p class="paper-p">
+              Hubble relies on 6 spinning-wheel rate gyroscopes to hold line-of-sight pointing jitter below 0.007 arcseconds. Over thermal cycles, rotor drift occurs.
+            </p>
+            <div class="paper-proc-box">
+              <h3 class="paper-proc-title">ASSEMBLY & FIX PROCEDURE:</h3>
+              <ol class="paper-step-list">
+                <li><strong>Slide Alignment Guide Pins:</strong> Screw titanium guide pins into opposite diagonal mounting holes to prevent blind-connector damage.</li>
+                <li><strong>Seat RSU-02 Canister:</strong> Slide the dual-gyro canister into Bay 2 until bottoming out flush on precision reference datum pins.</li>
+                <li><strong>Torque Fasteners:</strong> Use the <strong>Pistol Grip Torque Wrench (PGT)</strong> set strictly to <strong>30 N·m</strong> in a cross-star pattern.</li>
+                <li><strong>Telemetry Check:</strong> Verify zero-drift signal output on the telemetry diagnostic bus.</li>
+              </ol>
+            </div>
+          </div>
+
+          <!-- Page 3: Solar Drive (SADM) -->
+          <div class="paper-page" id="tab-sadm">
+            <h1 class="paper-doc-heading">SUB-TSK-M-02: Solar Array Drive Mechanism (SADM)</h1>
+            <div class="paper-meta-badge">PART: SADM Hinge & Bi-Stem Gearbox | TARGET: Port & Starboard Baffles</div>
+            <p class="paper-p">
+              Entering and leaving Earth eclipse induces extreme thermal shock (-100°C to +120°C in minutes). This causes thermal "bistrip" bending, creating jitter oscillations that disrupt camera exposures.
+            </p>
+            <div class="paper-proc-box">
+              <h3 class="paper-proc-title">SERVICING & FIX PROCEDURE:</h3>
+              <ol class="paper-step-list">
+                <li><strong>Release Lock Collar:</strong> Insert the <strong>5mm Drive Latch Hex Key</strong> into the secondary lock collar and rotate 90° clockwise.</li>
+                <li><strong>Mount Damper Clip:</strong> Attach the <strong>Cryo-rated Thermal Damper Clip</strong> over the bi-stem hinge to mechanically damp resonant vibrations.</li>
+                <li><strong>Apply Thermal Grease:</strong> Ensure space-grade thermal conductivity around the gear junction.</li>
+                <li><strong>Re-engage Drive:</strong> Lock latch and verify full 360° solar tracking articulation.</li>
+              </ol>
+            </div>
+          </div>
+
+          <!-- Page 4: Instrument Guide -->
+          <div class="paper-page" id="tab-tools">
+            <h1 class="paper-doc-heading">Hubble Space Facility Engineering Tool Context & Specifications</h1>
+            <div class="paper-tools-grid">
+              <div class="paper-tool-card">
+                <div class="paper-tool-name">Pistol Grip Torque Wrench (PGT)</div>
+                <div class="paper-tool-spec">COMPUTERIZED MICRO-TORQUE DRIVER</div>
+                <p class="paper-tool-p">Prevents thread stripping in zero-g flight alloys. Required Torque: 30 N·m.</p>
+              </div>
+              <div class="paper-tool-card">
+                <div class="paper-tool-name">Alignment Guide Pins</div>
+                <div class="paper-tool-spec">TITANIUM BLIND-MATE RODS</div>
+                <p class="paper-tool-p">Ensures blind electrical connectors seat cleanly without bent or sheared connector pins.</p>
+              </div>
+              <div class="paper-tool-card">
+                <div class="paper-tool-name">Drive Latch Hex Key (5mm)</div>
+                <div class="paper-tool-spec">BERYLLIUM-COPPER NON-MAGNETIC ALLOY</div>
+                <p class="paper-tool-p">Eliminates stray magnetic interference with Hubble's sensitive attitude star trackers.</p>
+              </div>
+              <div class="paper-tool-card">
+                <div class="paper-tool-name">Thermal Damper Clip</div>
+                <div class="paper-tool-spec">CRYO-RATED VISCOELASTIC DAMPER</div>
+                <p class="paper-tool-p">Absorbs high-frequency thermal snap resonance during day/night orbital transitions.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Page 5: NASA Official References & Systems Citations -->
+          <div class="paper-page" id="tab-nasa-citations">
+            <h1 class="paper-doc-heading">NASA Space Apps Challenge 2026: Systems Engineering Citations</h1>
+            <div class="paper-meta-badge">AUTHORITY: NASA GSFC &amp; JPL MISSION FORMULATION SPECIFICATIONS (CML 1–4)</div>
+            <div class="paper-citations-grid">
+              <div class="paper-citation-card">
+                <div class="citation-head">
+                  <span class="citation-badge">NASA GMAT R2026a</span>
+                  <span class="citation-title">General Mission Analysis Tool (Trajectory Engine)</span>
+                </div>
+                <p class="citation-text">
+                  Open-source NASA enterprise software for orbital propagation, launch-window analysis, and maneuver planning.
+                  Hubble Flight Trajectory: LEO 540 km altitude, 28.47° inclination, 95.42 min period, orbital velocity 7.59 km/s.
+                </p>
+                <div class="citation-link-row">
+                  <span class="citation-link-label">Trajectory Model:</span>
+                  <span class="citation-link-code">NASA GSFC / GMAT R2026a Enterprise Ephemeris</span>
+                </div>
+              </div>
+
+              <div class="paper-citation-card">
+                <div class="citation-head">
+                  <span class="citation-badge">JPL CML 1–4</span>
+                  <span class="citation-title">NASA Jet Propulsion Laboratory Concept Maturity Levels</span>
+                </div>
+                <p class="citation-text">
+                  Authoritative JPL framework for progressive mission concept maturity: CML 1 (Mission Concept), CML 2 (Initial Feasibility), CML 3 (Trade Studies comparing mass, power, and bandwidth), and CML 4 (Point Design &amp; CAD model specifications).
+                </p>
+                <div class="citation-link-row">
+                  <span class="citation-link-label">Methodology:</span>
+                  <span class="citation-link-code">NASA Space Apps Challenge Mission Formulation Standard</span>
+                </div>
+              </div>
+
+              <div class="paper-citation-card">
+                <div class="citation-head">
+                  <span class="citation-badge">GSFC MDL</span>
+                  <span class="citation-title">NASA Goddard Mission Design Lab</span>
+                </div>
+                <p class="citation-text">
+                  Collaborative cleanroom environment where scientists and engineers evaluate payload instruments, budgets ($150,000 baseline cap), and risk trade-offs before flight fabrication.
+                </p>
+                <div class="citation-link-row">
+                  <span class="citation-link-label">Facility Standard:</span>
+                  <span class="citation-link-code">NASA GSFC Building 29 High Bay Cleanroom</span>
+                </div>
+              </div>
+
+              <div class="paper-citation-card">
+                <div class="citation-head">
+                  <span class="citation-badge">CubeSat 101</span>
+                  <span class="citation-title">Basic Concepts and Processes for Spacecraft Developers</span>
+                </div>
+                <p class="citation-text">
+                  NASA foundational standard for Concept of Operations (ConOps), Class-100 cleanroom assembly protocols, and pre-flight qualification testing.
+                </p>
+                <div class="citation-link-row">
+                  <span class="citation-link-label">Standard:</span>
+                  <span class="citation-link-code">NASA CSLI Spacecraft Mission Guide</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 4: MECHANICAL WORKBENCH STATION (Figma Node 414:69)
+       ========================================================================= -->
+  <div id="modalWorkbench" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window modal-workbench-figma">
+      
+      <!-- TOP HEADER (Figma 414:50, 414:103, 414:105, 414:135, 414:144) -->
+      <div class="wb-figma-top-bar">
+        <div class="wb-figma-top-left">Workbench</div>
+        <div class="wb-figma-top-title">Mechanical Department</div>
+        <div class="wb-figma-top-actions">
+          <button id="btnWbRestart" class="wb-figma-btn restart" title="Restart Mission from Scratch" aria-label="Restart Mission">
+            <svg class="hud-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+            </svg>
+            <span>RESTART</span>
+          </button>
+          <button id="btnWbQuit" class="wb-figma-btn quit" title="Quit to Main Menu" aria-label="Quit to Main Menu">
+            <svg class="hud-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            <span>QUIT</span>
+          </button>
+          <button class="wb-figma-close-btn" id="btnCloseWorkbenchModal" aria-label="Close Modal">&times;</button>
+        </div>
+      </div>
+
+      <!-- SUB-HEADER TAB BAR (Figma 414:107, 414:109, 414:111, 414:113) -->
+      <div class="wb-figma-sub-tabs">
+        <button class="wb-figma-sub-tab active" id="tabSubtask01">
+          <span>Gyro Assembly</span>
+        </button>
+        <button class="wb-figma-sub-tab" id="tabSubtask02">
+          <span>SADM Solar Drive</span>
+        </button>
+      </div>
+
+      <!-- 3D SIMULATION VIEWPORT WRAPPER -->
+      <div class="wb-figma-viewport-wrapper">
+        <!-- VIEW 1: Subtask 01 Gyroscope Assembly -->
+        <div id="wbViewSubtask01" class="wb-subtask-view active">
+          <div id="wb3dCanvasContainer" class="wb3d-viewport-container">
+            <!-- 3D Canvas, Step HUD, Tool Shelf, and Timing Gauge rendered by Workbench3D -->
+          </div>
+        </div>
+
+        <!-- VIEW 2: Subtask 02 SADM Solar Drive -->
+        <div id="wbViewSubtask02" class="wb-subtask-view hidden">
+          <div id="wb3dCanvasContainerSadm" class="wb3d-viewport-container">
+            <!-- 3D Canvas, Step HUD, Tool Shelf, and Hex Latch Controls rendered by Sadm3D -->
+          </div>
+          <!-- Bottom Requisition Status Footer -->
+          <div class="wb-subtask-footer">
+            <div class="wb-footer-status">
+              <span class="status-indicator-dot" id="wbSadmOverallDot"></span>
+              <span id="sadmPartStatus">3D SOLAR DRIVE STATION ACTIVE</span>
+            </div>
+            <div class="wb-req-tags">
+              <span class="req-tag" id="reqSadmPart">SADM DRIVE HINGE</span>
+              <span class="req-tag" id="reqHexKey">HEX KEY [H]</span>
+              <span class="req-tag" id="reqDamperClip">DAMPER CLIP [C]</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOWER FOOTER COLUMNS (Figma 414:122, 414:124, 414:126, 414:129, 414:131, 414:133) -->
+      <div class="wb-figma-lower-footer">
+        <!-- Lower Left Controls -->
+        <div class="wb-figma-footer-left">
+          <!-- Box 1: Mode Switcher [ Reverse | Unbolt ] -->
+          <div class="wb-figma-mode-box" id="wbFooterModeBox">
+            <button class="wb-arrow-btn" id="btnWbModePrev" title="Previous Mode">◄</button>
+            <span class="wb-mode-text" id="wbFooterModeText">[ Reverse | Unbolt ]</span>
+            <button class="wb-arrow-btn" id="btnWbModeNext" title="Next Mode">►</button>
+          </div>
+          <!-- Box 2: Torque Limit Readout -->
+          <div class="wb-figma-torque-box" id="wbFooterTorqueBox">
+            <span class="wb-torque-label">Torque Limit :</span>
+            <span class="wb-torque-val" id="wbFooterTorqueVal">30 N-m</span>
+          </div>
+        </div>
+
+        <!-- Lower Center / Right: ERROR & CALM STATUS COLUMN -->
+        <div class="wb-figma-error-column" id="wbLowerErrorCol">
+          <span class="wb-error-icon" id="wbErrorIcon">●</span>
+          <span class="wb-error-message" id="wbLowerErrorMsg">SYSTEM READY // ESD BENCH CALIBRATED</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 5: MISSION ACCOMPLISHED & DEBRIEF CERTIFICATION
+       ========================================================================= -->
+  <div id="modalMissionAccomplished" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window debrief-modal-window">
+      <div class="modal-header">
+        <div class="modal-badge-title">
+          <span class="modal-dot active"></span>
+          <span>GSFC // MISSION CERTIFICATION & OFFICIAL FLIGHT LOG</span>
+        </div>
+        <button class="modal-close-btn" id="btnCloseDebriefModal" aria-label="Close Modal">&times;</button>
+      </div>
+
+      <div class="modal-content debrief-content">
+        <div class="debrief-banner">
+          <div class="debrief-crest">★ NASA GODDARD SPACE FLIGHT CENTER ★</div>
+          <h2 class="debrief-title">MISSION ACCOMPLISHED</h2>
+          <p class="debrief-subtitle">Hubble Space Telescope Servicing Mission 1 (SM1) Mechanical Bay Qualification</p>
+        </div>
+
+        <div class="debrief-stats-grid">
+          <div class="debrief-stat-card">
+            <span class="debrief-stat-lbl">FLIGHT ENGINEER</span>
+            <span class="debrief-stat-val" id="debriefOperatorName">Engineer Apprentice</span>
+          </div>
+          <div class="debrief-stat-card">
+            <span class="debrief-stat-lbl">ACTIVE SHIFT TIME</span>
+            <span class="debrief-stat-val" id="debriefDuration">00:06:24</span>
+          </div>
+          <div class="debrief-stat-card">
+            <span class="debrief-stat-lbl">REMAINING MISSION BUDGET</span>
+            <span class="debrief-stat-val highlight" id="debriefBudget">$82,300</span>
+          </div>
+          <div class="debrief-stat-card">
+            <span class="debrief-stat-lbl">OFFICIAL STATUS</span>
+            <span class="debrief-stat-val status-green">CHECKED OUT & CERTIFIED</span>
+          </div>
+        </div>
+
+        <div class="debrief-tasks-list">
+          <div class="debrief-task-row done">
+            <span class="debrief-task-check">✓</span>
+            <span class="debrief-task-desc">HST Bay 2 RSU-02 Rate Gyroscope: Old module extracted, Guide Pins aligned, Replacement mated and torqued to 30.0 N·m.</span>
+          </div>
+          <div class="debrief-task-row done">
+            <span class="debrief-task-check">✓</span>
+            <span class="debrief-task-desc">Solar Array Drive Mechanism (SADM): Latch engaged with Hex Key, Thermal Damper Clip stabilized, Motor synchronized.</span>
+          </div>
+        </div>
+
+        <div class="debrief-actions">
+          <button class="wb3d-btn" id="btnDebriefExplore">EXPLORE FACILITY</button>
+          <button class="wb3d-btn primary" id="btnDebriefMainMenu">RETURN TO MAIN MENU</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 1 (ELEC): COMPUTER CHECK-IN (Digital Session Sheet on Desk 02)
+       ========================================================================= -->
+  <div id="modalComputerSessionElec" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window">
+      <div class="modal-header">
+        <div class="modal-badge-title">
+          <span class="modal-dot market-dot"></span>
+          <span>GSFC TERMINAL // ELECTRONIC DEPARTMENT SESSION SHEET</span>
+        </div>
+        <button class="modal-close-btn" id="btnCloseComputerModalElec" aria-label="Close Modal">&times;</button>
+      </div>
+
+      <div class="modal-content">
+        <div class="session-sheet-form">
+          <div class="session-status-banner" id="sessionStatusBannerElec">
+            <span class="status-indicator-dot not-checked"></span>
+            <span id="sessionStatusLabelElec">STATUS: NOT CHECKED IN</span>
+          </div>
+
+          <div class="session-form-grid">
+            <div class="form-group">
+              <label>DATE & SYSTEM TIME</label>
+              <input type="text" id="sessionSheetClockElec" class="sheet-input-readonly" readonly value="--:--:-- UTC">
+            </div>
+
+            <div class="form-group">
+              <label>PROFESSION</label>
+              <input type="text" class="sheet-input-readonly" readonly value="Electrical Apprentice (Digital Circuitry & Logic)">
+            </div>
+
+            <div class="form-group">
+              <label>DEPARTMENT</label>
+              <input type="text" class="sheet-input-readonly" readonly value="Electronic Department (Desk 02 // Facility West)">
+            </div>
+
+            <div class="form-group">
+              <label for="inputOperatorNameElec">OPERATOR / APPRENTICE NAME</label>
+              <input type="text" id="inputOperatorNameElec" class="sheet-input-editable" value="Electrical Apprentice" spellcheck="false">
+            </div>
+          </div>
+
+          <div class="session-log-card" id="sessionLogCardElec">
+            <div class="log-title">SESSION LOG SHEET // GSFC AVIONICS DIVISION</div>
+            <div class="log-row"><span>Assigned Duty:</span> <span>HST DF-224 Hot-Swap & FGS Calibration</span></div>
+            <div class="log-row"><span>Supervising Division:</span> <span>NASA Goddard Space Flight Center</span></div>
+            <div class="log-row" id="sessionLogCheckinTimeElec"><span>Check-in Timestamp:</span> <span>PENDING</span></div>
+            <div class="log-row" id="sessionLogDurationElec"><span>Active Working Duration:</span> <span>00:00:00</span></div>
+          </div>
+
+          <!-- Phase 3 Telemetry Diagnostic Subsystem -->
+          <div class="session-diag-card" id="sessionDiagCardElec">
+            <div class="diag-header">
+              <span class="diag-icon">⚡</span>
+              <span class="diag-title">SUBSYSTEM TELEMETRY DIAGNOSTIC STATUS</span>
+            </div>
+            <div class="diag-progress-group">
+              <div class="diag-prog-row">
+                <span class="diag-lbl">[SUB-TSK-E-01] DF-224 Core Memory & Bus:</span>
+                <span class="diag-val" id="diagValE01">STANDBY</span>
+              </div>
+              <div class="diag-bar-track"><div class="diag-bar-fill" id="diagBarE01" style="width: 0%;"></div></div>
+            </div>
+            <div class="diag-progress-group">
+              <div class="diag-prog-row">
+                <span class="diag-lbl">[SUB-TSK-E-02] FGS Sensor Voltage & Waveform:</span>
+                <span class="diag-val" id="diagValE02">STANDBY</span>
+              </div>
+              <div class="diag-bar-track"><div class="diag-bar-fill" id="diagBarE02" style="width: 0%;"></div></div>
+            </div>
+            <button type="button" class="diag-run-btn disabled" id="btnRunTelemetryDiag" disabled>
+              <span class="diag-pulse-dot"></span>
+              <span>RUN SUBSYSTEM TELEMETRY DIAGNOSTIC</span>
+            </button>
+          </div>
+
+          <div class="session-actions-row">
+            <button class="session-btn btn-checkin" id="btnPerformCheckInElec">CHECK IN</button>
+            <button class="session-btn btn-checkout pending-look" id="btnPerformCheckOutElec">CHECK OUT</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 2 (ELEC): LAPTOP MARKETPLACE (Procurement on Desk 02)
+       ========================================================================= -->
+  <div id="modalLaptopMarketElec" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window modal-wide">
+      <div class="modal-header">
+        <div class="modal-badge-title">
+          <span class="modal-dot market-dot"></span>
+          <span>NASA TECHNICAL LOGISTICS & PROCUREMENT // ELECTRICAL REQUISITION</span>
+        </div>
+        <button class="modal-close-btn" id="btnCloseLaptopModalElec" aria-label="Close Modal">&times;</button>
+      </div>
+
+      <div class="modal-content">
+        <div class="market-top-banner">
+          <div class="market-budget-box">
+            <span class="budget-label">REMAINING ALLOCATED BUDGET</span>
+            <span class="budget-value" id="marketRemainingBudgetElec">$150,000</span>
+          </div>
+          <div class="market-req-tracker" id="elecMarketReqTracker">
+            <span class="req-tracker-label">FLIGHT REQUISITION STATUS</span>
+            <span class="req-tracker-count" id="elecReqCount">0 / 7 REQUIRED ACQUIRED</span>
+          </div>
+          <div class="market-info-note">
+            Procure high-grade space electronics, ESD safety equipment, and diagnostic tools according to the electrical memorandum.
+          </div>
+        </div>
+
+        <div class="market-items-grid" id="marketItemsGridElec">
+          <!-- Dynamically populated via JS for electronic components -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 3 (ELEC): RESEARCH & ASSEMBLY PAPERS (Manual on Desk 02)
+       ========================================================================= -->
+  <div id="modalResearchPapersElec" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window modal-research-paper-figma">
+      <!-- Left NASA Emerald/Blue Spine (Figma 414:31) -->
+      <div class="paper-left-spine spine-elec">
+        <span class="spine-text">NASA // HST-SM1 ELEC DIRECTIVE</span>
+      </div>
+
+      <!-- Right Document Sheet on Parchment Paper #fefae0 (Figma 414:30) -->
+      <div class="paper-doc-pane">
+        <button class="paper-close-btn" id="btnClosePapersModalElec" aria-label="Close Modal">&times;</button>
+
+        <!-- Top Horizontal Navigation Tabs (Figma 414:32 - 414:37) -->
+        <nav class="paper-top-tabs" aria-label="Electrical Research Paper Sections">
+          <button class="paper-tab active" data-tab="tab-elec-overview">Mission Overview</button>
+          <button class="paper-tab" data-tab="tab-elec-df224">DF-224 Flight Computer</button>
+          <button class="paper-tab" data-tab="tab-elec-fgs">FGS Sensor Calibration</button>
+          <button class="paper-tab" data-tab="tab-elec-sade">Solar Drive (SADE)</button>
+          <button class="paper-tab" data-tab="tab-elec-bcc">Battery Charge Control</button>
+          <button class="paper-tab" data-tab="tab-elec-tools">Instrument Guide</button>
+          <button class="paper-tab" data-tab="tab-elec-citations">NASA References</button>
+        </nav>
+
+        <!-- Document Pages Container -->
+        <div class="paper-pages-wrapper">
+          <!-- Page 1: Mission Overview -->
+          <div class="paper-page active" id="tab-elec-overview">
+            <h1 class="paper-doc-heading">Hubble Space Telescope Electronic Servicing Directive</h1>
+            <div class="paper-meta-badge">AUTHOR: Goddard Avionics & Electrical Engineering Group | REVISION: 5.0</div>
+            <p class="paper-p">
+              Hubble's core digital flight computer, sensor interfaces, and power regulation avionics operate in the severe radiation and temperature cycling environment of Low Earth Orbit (LEO). Electrostatic discharge and telemetry drift require periodic servicing.
+            </p>
+            <p class="paper-p">
+              <strong class="paper-strong">Apprentice Scope:</strong> Practical hands-on qualification requires the electrical apprentice to execute digital circuitry repair, logic bus hot-swapping, and frequency alignment:
+            </p>
+            <div class="paper-scope-grid">
+              <div class="paper-scope-card">
+                <div class="scope-card-header">
+                  <span class="scope-tag">[SUB-TSK-E-01]</span>
+                  <span class="scope-title">DF-224 Primary Flight Computer</span>
+                </div>
+                <p class="scope-desc">Hot-swap burnt memory PCB board, enforce strict ESD grounding protocols, and reconnect 50-pin gold data ribbon cable.</p>
+              </div>
+              <div class="paper-scope-card">
+                <div class="scope-card-header">
+                  <span class="scope-tag">[SUB-TSK-E-02]</span>
+                  <span class="scope-title">Fine Guidance Sensor (FGS) Electronics</span>
+                </div>
+                <p class="scope-desc">Probe test points with digital multimeter, tune potentiometer to exactly 5.0V ±0.1V, and align oscilloscope telemetry waveforms.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Page 2: DF-224 -->
+          <div class="paper-page" id="tab-elec-df224">
+            <h1 class="paper-doc-heading">SUB-TSK-E-01: DF-224 Main Computer Repair Manual</h1>
+            <div class="paper-meta-badge">PART: DF-224 Avionic Bay | TARGET: Primary Science Computer</div>
+            <p class="paper-p">
+              Space electronics are extremely sensitive to electrostatic discharge (ESD). A stray static spark can instantly destroy silicon junctions.
+            </p>
+            <div class="paper-proc-box">
+              <h3 class="paper-proc-title">STEP-BY-STEP REPAIR PROCEDURE:</h3>
+              <ol class="paper-step-list">
+                <li><strong>Electrostatic Discharge (ESD) Safety Protocol:</strong> Before touching any electronic component, click the Grounding Wrist Strap [Key 1] to attach it to your suit. <em>Failure to do so triggers a bright blue spark and destroys the replacement component!</em></li>
+                <li><strong>Harness & Ribbon Cable Extraction:</strong> Use Precision Tweezers [Key 2] to click both gold safety tabs locking the Kapton data ribbon cable, then drag the cable backward out of its slot.</li>
+                <li><strong>Swapping the PCB Board:</strong> Clamp the Anti-Static IC Extractor [Key 3] onto the burnt board and pull upward. Align the new flight PCB with guide rails and press down until it snaps into the socket.</li>
+                <li><strong>Re-cabling & Locking:</strong> Drag the data ribbon back into the new board slot and press [E] to push the locking pins down.</li>
+              </ol>
+            </div>
+          </div>
+
+          <!-- Page 3: FGS -->
+          <div class="paper-page" id="tab-elec-fgs">
+            <h1 class="paper-doc-heading">SUB-TSK-E-02: Fine Guidance Sensor (FGS) Calibration</h1>
+            <div class="paper-meta-badge">PART: FGS Diagnostic Housing | TARGET: Optical Interferometer Electronics</div>
+            <p class="paper-p">
+              The FGS interferometer measures star positions with 0.003 arcsecond accuracy. Subsystem telemetry noise causes pointing jitter unless voltage and waveforms are calibrated.
+            </p>
+            <div class="paper-proc-box">
+              <h3 class="paper-proc-title">CALIBRATION PROCEDURE:</h3>
+              <ol class="paper-step-list">
+                <li><strong>Multimeter Voltage Check:</strong> Equip Multimeter Probes [Key 4]. Touch the Red (+) Probe to Node A and Black (-) Probe to Node B. Verify under-voltage condition (reads 3.2V; must be 5.0V).</li>
+                <li><strong>Potentiometer Tuning:</strong> Equip Ceramic Screwdriver [Key 5]. Click and rotate the adjustment screw clockwise. Watch the digital multimeter rise: stop exactly at <strong>5.0V (± 0.1V)</strong>.</li>
+                <li><strong>Oscilloscope Waveform Frequency Sync:</strong> Click the tuning knob to adjust frequency to <strong>1000 Hz</strong> until the sine wave stabilizes into a coherent green telemetry lock.</li>
+              </ol>
+            </div>
+          </div>
+
+          <!-- Page 4: SADE -->
+          <div class="paper-page" id="tab-elec-sade">
+            <h1 class="paper-doc-heading">Solar Array Drive Electronics (SADE) Specification</h1>
+            <div class="paper-meta-badge">SUBSYSTEM: Solar Panel Gimbal Power Bus | RATING: 28V DC Cleanroom Regulated</div>
+            <p class="paper-p">
+              The Solar Array Drive Electronics control the stepper motor drivers rotating Hubble's solar wings to maintain perpendicular solar incidence while slewing.
+            </p>
+            <div class="paper-proc-box">
+              <h3 class="paper-proc-title">ELECTRICAL CHECKS:</h3>
+              <p class="paper-p">Verify drive pulse train at 400 Hz step frequency. Check current draw limits under 1.8 Amperes during high-torque orbital day transitions.</p>
+            </div>
+          </div>
+
+          <!-- Page 5: BCC -->
+          <div class="paper-page" id="tab-elec-bcc">
+            <h1 class="paper-doc-heading">Battery Charge Controller (BCC) & Power Bus Directive</h1>
+            <div class="paper-meta-badge">SUBSYSTEM: NiCd Battery Modules | CAPACITY: 6x 88 Amp-Hour Space Cells</div>
+            <p class="paper-p">
+              Hubble uses six Nickel-Cadmium rechargeable battery modules to power science instruments during the 36-minute orbital eclipse each orbit.
+            </p>
+            <div class="paper-proc-box">
+              <h3 class="paper-proc-title">CHARGE CURVE PROTOCOL:</h3>
+              <p class="paper-p">Maintain trickle charge at +33.8V DC. Over-voltage protection circuit cutoff triggers automatically at +35.2V DC.</p>
+            </div>
+          </div>
+
+          <!-- Page 6: Tools -->
+          <div class="paper-page" id="tab-elec-tools">
+            <h1 class="paper-doc-heading">Electronics Flight Instrument Catalog & Tool Guide</h1>
+            <div class="paper-meta-badge">STANDARDS: NASA-STD-8739.4 Workmanship for Electrical Assemblies</div>
+            <div class="paper-scope-grid">
+              <div class="paper-scope-card">
+                <div class="scope-card-header"><span class="scope-tag">[KEY 1]</span><span class="scope-title">Grounding Wrist Strap</span></div>
+                <p class="scope-desc">1 Megohm conductive carbon wrist strap with alligator clip to bench ground. Eliminates electrostatic discharge.</p>
+              </div>
+              <div class="paper-scope-card">
+                <div class="scope-card-header"><span class="scope-tag">[KEY 2]</span><span class="scope-title">Precision Tweezers</span></div>
+                <p class="scope-desc">Non-magnetic antimagnetic stainless steel tweezers for unlocking 50-pin Kapton ribbon zero-insertion-force connector tabs.</p>
+              </div>
+              <div class="paper-scope-card">
+                <div class="scope-card-header"><span class="scope-tag">[KEY 3]</span><span class="scope-title">Anti-Static IC Extractor</span></div>
+                <p class="scope-desc">Insulated spring steel gripper designed to lift damaged circuit boards squarely without bending socket pins.</p>
+              </div>
+              <div class="paper-scope-card">
+                <div class="scope-card-header"><span class="scope-tag">[KEY 4]</span><span class="scope-title">Multimeter Probes</span></div>
+                <p class="scope-desc">Gold-plated high-impedance needle test leads rated for 1000V Category III cleanroom digital diagnostic readings.</p>
+              </div>
+              <div class="paper-scope-card">
+                <div class="scope-card-header"><span class="scope-tag">[KEY 5]</span><span class="scope-title">Ceramic Screwdriver</span></div>
+                <p class="scope-desc">Non-inductive, non-magnetic zirconia ceramic blade trimmer driver. Prevents electromagnetic coupling while tuning high-frequency potentiometers.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Page 7: NASA Official References (Elec) -->
+          <div class="paper-page" id="tab-elec-citations">
+            <h1 class="paper-doc-heading">NASA Space Apps Challenge 2026: Avionics Systems Engineering Citations</h1>
+            <div class="paper-meta-badge">STANDARDS: NASA-STD-8739.4 // GSFC CLASS-100 ESD &amp; CML STANDARDS</div>
+            <div class="paper-citations-grid">
+              <div class="paper-citation-card">
+                <div class="citation-head">
+                  <span class="citation-badge">NASA GMAT R2026a</span>
+                  <span class="citation-title">Goddard Space Flight Center Avionics Telemetry Specs</span>
+                </div>
+                <p class="citation-text">
+                  DF-224 flight computer memory registers track 32-bit floating-point ephemeris coordinates propagated by GMAT's physical gravity and solar radiation pressure integration models.
+                </p>
+                <div class="citation-link-row">
+                  <span class="citation-link-label">Specification:</span>
+                  <span class="citation-link-code">NASA GMAT Ephemeris Data Matrix R2026a</span>
+                </div>
+              </div>
+
+              <div class="paper-citation-card">
+                <div class="citation-head">
+                  <span class="citation-badge">JPL CML 1–4</span>
+                  <span class="citation-title">Avionics Architecture Trade Studies (CML-3)</span>
+                </div>
+                <p class="citation-text">
+                  Evaluates power draw (2,200W baseline), cryogenic thermal dissipators, and radiation-hardened memory chips against payload scientific sensitivity objectives.
+                </p>
+                <div class="citation-link-row">
+                  <span class="citation-link-label">Formulation:</span>
+                  <span class="citation-link-code">NASA Space Apps 2026 Space Mission Design Reference</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 4 (ELEC): ELECTRONICS WORKBENCH STATION (On Desk 02)
+       ========================================================================= -->
+  <div id="modalElectronicsWorkbench" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window modal-workbench-figma">
+      
+      <!-- TOP HEADER (Figma 419:2) -->
+      <div class="wb-figma-top-bar">
+        <div class="wb-figma-top-left">Workbench</div>
+        <div class="wb-figma-top-title">Electronic Department</div>
+        <div class="wb-figma-top-actions">
+          <button id="btnWbElecRestart" class="wb-figma-btn restart" title="Restart Mission" aria-label="Restart Mission">
+            <svg class="hud-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+            </svg>
+            <span>RESTART</span>
+          </button>
+          <button id="btnWbElecQuit" class="wb-figma-btn quit" title="Quit to Main Menu" aria-label="Quit to Main Menu">
+            <svg class="hud-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            <span>QUIT</span>
+          </button>
+          <button class="wb-figma-close-btn" id="btnCloseElectronicsWorkbenchModal" aria-label="Close Modal">&times;</button>
+        </div>
+      </div>
+
+      <!-- SUB-HEADER TAB BAR -->
+      <div class="wb-figma-sub-tabs">
+        <button class="wb-figma-sub-tab active" id="tabSubtaskE01">
+          <span>[SUB-TSK-E-01] DF-224 Main Computer Repair</span>
+        </button>
+        <button class="wb-figma-sub-tab" id="tabSubtaskE02">
+          <span>[SUB-TSK-E-02] FGS Electronics Calibration</span>
+        </button>
+      </div>
+
+      <!-- 3D SIMULATION VIEWPORT WRAPPER -->
+      <div class="wb-figma-viewport-wrapper">
+        <div id="wb3dCanvasContainerElec" class="wb3d-viewport-container esd-mat-bg">
+          <!-- 3D Canvas rendered by ElectronicsWorkbench3D -->
+        </div>
+      </div>
+
+      <!-- LOWER FOOTER -->
+      <!-- LOWER FOOTER COLUMNS (Figma 414:122, 414:124, 414:126, 414:129, 414:131, 414:133) -->
+      <div class="wb-figma-lower-footer">
+        <!-- Lower Left Controls -->
+        <div class="wb-figma-footer-left">
+          <!-- Box 1: Mode Switcher -->
+          <div class="wb-figma-mode-box" id="wbElecFooterModeBox">
+            <button class="wb-arrow-btn" id="btnWbElecModePrev" title="Previous Mode">◄</button>
+            <span class="wb-mode-text" id="wbElecFooterModeText">[ ESD Grounded | 0.0V ]</span>
+            <button class="wb-arrow-btn" id="btnWbElecModeNext" title="Next Mode">►</button>
+          </div>
+          <!-- Box 2: Readout -->
+          <div class="wb-figma-torque-box" id="wbElecFooterVoltageBox">
+            <span class="wb-torque-label">Bus Voltage :</span>
+            <span class="wb-torque-val" id="wbElecFooterVoltageVal">5.00 V</span>
+          </div>
+        </div>
+
+        <!-- Lower Center / Right: ERROR & CALM STATUS COLUMN -->
+        <div class="wb-figma-error-column" id="wbElecLowerErrorCol">
+          <span class="wb-error-icon" id="wbElecErrorIcon">●</span>
+          <span class="wb-error-message" id="wbElecLowerErrorMsg">SYSTEM READY // CLASS 100 ESD WORKSTATION GROUNDED</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: COMPUTER CHECK-IN (Desk 03 - Network Department - South Wall)
+       ========================================================================= -->
+  <div id="modalComputerSessionNet" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window">
+      <div class="modal-header">
+        <div class="modal-badge-title">
+          <span class="modal-dot market-dot"></span>
+          <span>GSFC TERMINAL // NETWORK & TELECOMMUNICATIONS SESSION SHEET</span>
+        </div>
+        <button class="modal-close-btn" id="btnCloseComputerModalNet" aria-label="Close Modal">&times;</button>
+      </div>
+
+      <div class="modal-content">
+        <div class="session-sheet-form">
+          <div class="session-status-banner" id="sessionStatusBannerNet">
+            <span class="status-indicator-dot not-checked"></span>
+            <span id="sessionStatusLabelNet">STATUS: NOT CHECKED IN</span>
+          </div>
+
+          <div class="session-form-grid">
+            <div class="form-group">
+              <label>DATE & SYSTEM TIME</label>
+              <input type="text" id="sessionSheetClockNet" class="sheet-input-readonly" readonly value="--:--:-- UTC">
+            </div>
+
+            <div class="form-group">
+              <label>PROFESSION</label>
+              <input type="text" class="sheet-input-readonly" readonly value="Network Apprentice (RF Telemetry & Optical Fiber Bus)">
+            </div>
+
+            <div class="form-group">
+              <label>DEPARTMENT</label>
+              <input type="text" class="sheet-input-readonly" readonly value="Network & Comm Department (Desk 03 // Facility South)">
+            </div>
+
+            <div class="form-group">
+              <label for="inputOperatorNameNet">OPERATOR / APPRENTICE NAME</label>
+              <input type="text" id="inputOperatorNameNet" class="sheet-input-editable" value="Network Apprentice" spellcheck="false">
+            </div>
+          </div>
+
+          <div class="session-log-card" id="sessionLogCardNet">
+            <div class="log-title">SESSION LOG SHEET // GSFC TELECOMMUNICATIONS DIVISION</div>
+            <div class="log-row"><span>Assigned Duty:</span> <span>HGA Realignment & SI-C&DH Fiber Bus Splicing</span></div>
+            <div class="log-row"><span>Supervising Division:</span> <span>NASA Goddard Space Flight Center</span></div>
+            <div class="log-row" id="sessionLogCheckinTimeNet"><span>Check-in Timestamp:</span> <span>PENDING</span></div>
+            <div class="log-row" id="sessionLogDurationNet"><span>Active Working Duration:</span> <span>00:00:00</span></div>
+          </div>
+
+          <!-- Phase 3 Telemetry Diagnostic Subsystem -->
+          <div class="session-diag-card" id="sessionDiagCardNet">
+            <div class="diag-header">
+              <span class="diag-icon">📡</span>
+              <span class="diag-title">TDRSS KU-BAND SATELLITE LINK STATUS</span>
+            </div>
+            <div class="diag-body">
+              <div class="diag-item">
+                <span class="diag-lbl">CARRIER LOCK:</span>
+                <span class="diag-val" id="diagNetCarrierLock">UNLOCKED (Δφ: 135°)</span>
+              </div>
+              <div class="diag-item">
+                <span class="diag-lbl">SI-C&DH FIBER BUS:</span>
+                <span class="diag-val" id="diagNetFiberLoss">ATTENUATION: SEVERED</span>
+              </div>
+              <div class="diag-item">
+                <span class="diag-lbl">DOWNLINK BANDWIDTH:</span>
+                <span class="diag-val highlight" id="diagNetDownlink">0.000 Mbps [STANDBY]</span>
+              </div>
+            </div>
+            <button class="sheet-action-btn diag-btn" id="btnRunCommDiag" disabled>
+              RUN TDRSS COMM CHECK-OUT DIAGNOSTIC
+            </button>
+          </div>
+
+          <div class="session-actions">
+            <button class="sheet-action-btn primary" id="btnPerformCheckInNet">
+              CHECK IN & AUTHORIZE TERMINAL
+            </button>
+            <button class="sheet-action-btn secondary" id="btnPerformCheckOutNet" disabled>
+              MANDATORY PROTOCOL: CHECK-OUT
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: MARKETPLACE LAPTOP (Desk 03 - Network Department - South Wall)
+       ========================================================================= -->
+  <div id="modalLaptopMarketNet" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window modal-wide">
+      <div class="modal-header">
+        <div class="modal-badge-title">
+          <span class="modal-dot market-dot"></span>
+          <span>NASA TECHNICAL LOGISTICS & PROCUREMENT // NETWORK & RF REQUISITION</span>
+        </div>
+        <button class="modal-close-btn" id="btnCloseLaptopModalNet" aria-label="Close Modal">&times;</button>
+      </div>
+
+      <div class="modal-content">
+        <div class="market-top-banner">
+          <div class="market-budget-box">
+            <span class="budget-label">REMAINING ALLOCATED BUDGET</span>
+            <span class="budget-value" id="marketRemainingBudgetNet">$150,000</span>
+          </div>
+          <div class="market-req-tracker" id="netMarketReqTracker">
+            <span class="req-tracker-label">FLIGHT REQUISITION STATUS</span>
+            <span class="req-tracker-count" id="netReqCount">0 / 5 REQUIRED ACQUIRED</span>
+          </div>
+          <div class="market-info-note">
+            Procure specialized high-frequency RF tools, ruby laser sights, waveguide couplers, and fusion splice protection modules according to the network memorandum.
+          </div>
+        </div>
+
+        <div class="market-items-grid" id="marketCatalogGridNet">
+          <!-- Dynamically populated via renderMarketplaceNet() in script.js?v=4.2 -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: RESEARCH PAPERS (Desk 03 - Network Department - South Wall)
+       ========================================================================= -->
+  <div id="modalResearchPapersNet" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window modal-research-paper-figma">
+      <!-- Left NASA Cyan Spine (Figma 414:31) -->
+      <div class="paper-left-spine spine-net">
+        <span class="spine-text">NASA // HST-SM1 COMM DIRECTIVE</span>
+      </div>
+
+      <!-- Right Document Sheet on Parchment Paper #fefae0 (Figma 414:30) -->
+      <div class="paper-doc-pane">
+        <button class="paper-close-btn" id="btnClosePapersModalNet" aria-label="Close Modal">&times;</button>
+
+        <!-- Top Horizontal Navigation Tabs (Figma 414:32 - 414:37) -->
+        <nav class="paper-top-tabs" aria-label="Network Research Paper Sections">
+          <button class="paper-tab active" data-tab="tab-net-overview">Mission Overview</button>
+          <button class="paper-tab" data-tab="tab-net-hga">HGA Transceiver & Gimbal</button>
+          <button class="paper-tab" data-tab="tab-net-fiber">SI-C&DH Fiber Splice</button>
+          <button class="paper-tab" data-tab="tab-net-tdrss">TDRSS Constellation Link</button>
+          <button class="paper-tab" data-tab="tab-net-waveguide">Waveguide Couplers</button>
+          <button class="paper-tab" data-tab="tab-net-tools">Instrument Guide</button>
+          <button class="paper-tab" data-tab="tab-net-citations">NASA References</button>
+        </nav>
+
+        <!-- Document Pages Container -->
+        <div class="paper-pages-wrapper">
+          <!-- Page 1: Mission Overview -->
+          <div class="paper-page active" id="tab-net-overview">
+            <h1 class="paper-doc-heading">Hubble Space Telescope Network & Telecommunications Directive</h1>
+            <div class="paper-meta-badge">AUTHOR: Goddard Space Telecommunications Group | REVISION: 4.8</div>
+            <p class="paper-p">
+              Hubble's high-gain steerable parabolic dishes and onboard Science Instrument Command & Data Handling (SI-C&DH) optical bus provide the critical 1.0 Mbps communication pipeline to Earth via the TDRSS geosynchronous satellite constellation.
+            </p>
+            <p class="paper-p">
+              <strong class="paper-strong">Apprentice Scope:</strong> Practical hands-on qualification requires the telecommunications apprentice to install, torque, calibrate, and service the primary RF and optical data links:
+            </p>
+            <div class="paper-scope-grid">
+              <div class="paper-scope-card">
+                <div class="scope-card-header">
+                  <span class="scope-tag">[SUB-TSK-N-01]</span>
+                  <span class="scope-title">High Gain Antenna (HGA) Ku-Band Gimbal</span>
+                </div>
+                <p class="scope-desc">Dual-axis directional steerable antenna mast. Eliminates RF signal loss and tracks TDRSS satellites across 15.003 GHz downlink carrier.</p>
+              </div>
+              <div class="paper-scope-card">
+                <div class="scope-card-header">
+                  <span class="scope-tag">[SUB-TSK-N-02]</span>
+                  <span class="scope-title">SI-C&DH Fiber Bus Fusion Splice</span>
+                </div>
+                <p class="scope-desc">Radiation-hardened optical fiber harness. Strips buffer jackets, cleaves 90° glass cores, and welds fiber strands with &lt;0.05 dB attenuation.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Page 2: HGA -->
+          <div class="paper-page" id="tab-net-hga">
+            <h1 class="paper-doc-heading">SUB-TSK-N-01: High Gain Antenna Gimbal Realignment</h1>
+            <div class="paper-meta-badge">PART: HGA Gimbal Mast | FREQUENCY: 15.003 GHz (Ku-Band) / 2.2 GHz (S-Band)</div>
+            <p class="paper-p">
+              Thermal expansion on the mast hinges causes azimuth/elevation tracking error. Unless the RF feedhorn is torqued and sighted with laser precision, contact with TDRSS satellites is lost during orbit apogee.
+            </p>
+            <div class="paper-proc-box">
+              <h3 class="paper-proc-title">ASSEMBLY & FIX PROCEDURE:</h3>
+              <ol class="paper-step-list">
+                <li><strong>RF Flange Calibration:</strong> Equip RF Pneumatic Torque Wrench [Key 1]. Torque all 4 beryllium-copper mounting bolts diagonally to exactly <strong>12.0 Nm</strong>.</li>
+                <li><strong>Laser Sight Alignment:</strong> Equip Laser Alignment Sight [Key 2]. Click the sight mount onto the feedhorn bracket. Adjust elevation and azimuth until the ruby laser dot centers inside the green target reticle ring (Δφ &lt; 0.5°).</li>
+                <li><strong>Gold Waveguide Coupler Sealing:</strong> Attach the gold RF waveguide coupler to eliminate signal reflection and lock in the 15.003 GHz carrier.</li>
+              </ol>
+            </div>
+          </div>
+
+          <!-- Page 3: Fiber -->
+          <div class="paper-page" id="tab-net-fiber">
+            <h1 class="paper-doc-heading">SUB-TSK-N-02: SI-C&DH Optical Fiber Fusion Splice</h1>
+            <div class="paper-meta-badge">PART: Optical Data Bus Trunk | LOSS TARGET: &lt; 0.05 dB Attenuation</div>
+            <p class="paper-p">
+              Micrometeoroid damage has severed the primary 100-micron glass fiber trunk between the science instrument bay and the telemetry formatter.
+            </p>
+            <div class="paper-proc-box">
+              <h3 class="paper-proc-title">FACILITY OPTICAL SPLICING PROCEDURE:</h3>
+              <ol class="paper-step-list">
+                <li><strong>Buffer Stripping & Cleaving:</strong> Equip Fiber Stripper & Cleaver [Key 3]. Clamp the 250μm outer jacket, strip to the 125μm glass cladding, and trigger the diamond cleaver for a perpendicular 90.0° mirror face.</li>
+                <li><strong>Fusion Arc Alignment:</strong> Mount both cleaved fiber tips into the V-grooves of the Fusion Splicer. Inspect core alignment on the high-magnification screen.</li>
+                <li><strong>Electric Arc Weld:</strong> Press [SPACE] to fire the high-voltage micro-plasma arc. Verify core fusion loss is below 0.02 dB.</li>
+                <li><strong>Thermal Protection Sleeve:</strong> Slide the heat-shrink stainless steel sleeve over the joint and bake for 30 seconds to provide tensile strain relief.</li>
+              </ol>
+            </div>
+          </div>
+
+          <!-- Page 4: TDRSS -->
+          <div class="paper-page" id="tab-net-tdrss">
+            <h1 class="paper-doc-heading">Tracking & Data Relay Satellite System (TDRSS) Architecture</h1>
+            <div class="paper-meta-badge">ORBIT: Geosynchronous Equatorial (35,786 km) | DOWNLINK: White Sands Ground Station</div>
+            <p class="paper-p">
+              Hubble relays all digital astrophysics frames through TDRS-East and TDRS-West. Direct ground contact is impossible due to the 28.5° orbital inclination and low altitude.
+            </p>
+            <div class="paper-proc-box">
+              <h3 class="paper-proc-title">RELAY CONSTRAINTS:</h3>
+              <p class="paper-p">Ku-Band HGA delivers 1.024 Mbps raw image telemetry. Low Gain Omnidirectional Antennas provide a 4.0 kbps emergency beacon backup channel if pointing is lost.</p>
+            </div>
+          </div>
+
+          <!-- Page 5: Waveguide -->
+          <div class="paper-page" id="tab-net-waveguide">
+            <h1 class="paper-doc-heading">Waveguide Couplers & RF Transmission Directives</h1>
+            <div class="paper-meta-badge">COMPONENT: WR-62 Gold-Plated Flange | BAND: Ku-Band (12.4 - 18.0 GHz)</div>
+            <p class="paper-p">
+              Microwave signal integrity requires flawless mechanical contact across waveguide seams. Surface oxidation or particulate debris causes internal arcing under vacuum.
+            </p>
+            <div class="paper-proc-box">
+              <h3 class="paper-proc-title">INSPECTION CHECKLIST:</h3>
+              <p class="paper-p">Verify gold plating thickness &gt; 50 microinches. Use space-grade fluorosilicone O-rings to maintain pressurized dry nitrogen seal during ground integration.</p>
+            </div>
+          </div>
+
+          <!-- Page 6: Tools -->
+          <div class="paper-page" id="tab-net-tools">
+            <h1 class="paper-doc-heading">Network Department Instrument Catalog & Tool Guide</h1>
+            <div class="paper-meta-badge">STANDARDS: MIL-STD-188-111 & NASA GSFC Comm Standards</div>
+            <div class="paper-scope-grid">
+              <div class="paper-scope-card">
+                <div class="scope-card-header"><span class="scope-tag">[KEY 1]</span><span class="scope-title">RF Pneumatic Torque Wrench</span></div>
+                <p class="scope-desc">Aerospace torque driver with digital strain gauge calibrated for 0.05 Nm increments on RF waveguide flanges.</p>
+              </div>
+              <div class="paper-scope-card">
+                <div class="scope-card-header"><span class="scope-tag">[KEY 2]</span><span class="scope-title">Laser Alignment Sight</span></div>
+                <p class="scope-desc">650nm Class II collimated diode laser with concentric target optics for bore-sighting the High Gain Antenna feedhorn.</p>
+              </div>
+              <div class="paper-scope-card">
+                <div class="scope-card-header"><span class="scope-tag">[KEY 3]</span><span class="scope-title">Fiber Stripper & Cleaver</span></div>
+                <p class="scope-desc">Three-hole precision thermal stripper and diamond wheel blade cleaver for 125μm space-qualified singlemode optical fibers.</p>
+              </div>
+              <div class="paper-scope-card">
+                <div class="scope-card-header"><span class="scope-tag">[KEY 4]</span><span class="scope-title">Gold RF Waveguide Coupler</span></div>
+                <p class="scope-desc">Ultra-low-loss gold-plated waveguide transition block linking receiver chassis to gimbaled antenna coax.</p>
+              </div>
+              <div class="paper-scope-card">
+                <div class="scope-card-header"><span class="scope-tag">[KEY 5]</span><span class="scope-title">Fusion Splice Protection Modules</span></div>
+                <p class="scope-desc">Heat-shrinkable fluoropolymer tubing with internal stainless steel reinforcement strength member.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Page 7: NASA Official References (Network) -->
+          <div class="paper-page" id="tab-net-citations">
+            <h1 class="paper-doc-heading">NASA Space Apps Challenge 2026: RF &amp; Telecommunications Citations</h1>
+            <div class="paper-meta-badge">STANDARDS: NASA SPACE NETWORK &amp; TDRSS CONSTELLATION PROTOCOLS</div>
+            <div class="paper-citations-grid">
+              <div class="paper-citation-card">
+                <div class="citation-head">
+                  <span class="citation-badge">NASA Mission Viz 3D</span>
+                  <span class="citation-title">Space Communications &amp; Navigation (SCaN) Architecture</span>
+                </div>
+                <p class="citation-text">
+                  Models multi-point RF line-of-sight between Low Earth Orbit satellites and geostationary tracking relays, providing continuous 360-degree science telemetry links.
+                </p>
+                <div class="citation-link-row">
+                  <span class="citation-link-label">Simulation Standard:</span>
+                  <span class="citation-link-code">NASA Space Apps 2026 Web-Based Orbital Viz</span>
+                </div>
+              </div>
+
+              <div class="paper-citation-card">
+                <div class="citation-head">
+                  <span class="citation-badge">CubeSat 101</span>
+                  <span class="citation-title">Ground Station Link Budget Equations</span>
+                </div>
+                <p class="citation-text">
+                  Enforces minimum +3 dB signal-to-noise link margin on S-band command uplink and 1.0 Mbps Ku-band digital science payload downlink.
+                </p>
+                <div class="citation-link-row">
+                  <span class="citation-link-label">Reference:</span>
+                  <span class="citation-link-code">NASA CSLI Space Mission Communications Standard</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: NETWORK WORKBENCH STATION (Desk 03 - Network Department - South Wall)
+       ========================================================================= -->
+  <div id="modalNetworkWorkbench" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window modal-workbench-figma">
+      
+      <!-- TOP HEADER (Figma 419:2) -->
+      <div class="wb-figma-top-bar">
+        <div class="wb-figma-top-left">Workbench</div>
+        <div class="wb-figma-top-title">Network & Comm Department</div>
+        <div class="wb-figma-top-actions">
+          <button id="btnWbNetRestart" class="wb-figma-btn restart" title="Restart Mission" aria-label="Restart Mission">
+            <svg class="hud-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+            </svg>
+            <span>RESTART</span>
+          </button>
+          <button id="btnWbNetQuit" class="wb-figma-btn quit" title="Quit to Main Menu" aria-label="Quit to Main Menu">
+            <svg class="hud-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            <span>QUIT</span>
+          </button>
+          <button class="wb-figma-close-btn" id="btnCloseNetworkWorkbenchModal" aria-label="Close Modal">&times;</button>
+        </div>
+      </div>
+
+      <!-- SUB-HEADER TAB BAR -->
+      <div class="wb-figma-sub-tabs">
+        <button class="wb-figma-sub-tab active" id="tabSubtaskN01">
+          <span>[SUB-TSK-N-01] HGA Transceiver & Ku-Band Gimbal</span>
+        </button>
+        <button class="wb-figma-sub-tab" id="tabSubtaskN02">
+          <span>[SUB-TSK-N-02] SI-C&DH Fiber Bus Fusion Splice</span>
+        </button>
+      </div>
+
+      <!-- 3D SIMULATION VIEWPORT WRAPPER -->
+      <div class="wb-figma-viewport-wrapper">
+        <div id="wb3dCanvasContainerNet" class="wb3d-viewport-container rf-mat-bg">
+          <!-- 3D Canvas rendered by NetworkWorkbench3D -->
+        </div>
+      </div>
+
+      <!-- LOWER FOOTER -->
+      <!-- LOWER FOOTER COLUMNS (Figma 414:122, 414:124, 414:126, 414:129, 414:131, 414:133) -->
+      <div class="wb-figma-lower-footer">
+        <!-- Lower Left Controls -->
+        <div class="wb-figma-footer-left">
+          <!-- Box 1: Mode Switcher -->
+          <div class="wb-figma-mode-box" id="wbNetFooterModeBox">
+            <button class="wb-arrow-btn" id="btnWbNetModePrev" title="Previous Mode">◄</button>
+            <span class="wb-mode-text" id="wbNetFooterModeText">[ Ku-Band | High Gain ]</span>
+            <button class="wb-arrow-btn" id="btnWbNetModeNext" title="Next Mode">►</button>
+          </div>
+          <!-- Box 2: Readout -->
+          <div class="wb-figma-torque-box" id="wbNetFooterLinkBox">
+            <span class="wb-torque-label">RF Waveguide :</span>
+            <span class="wb-torque-val" id="wbNetFooterTorqueVal">12 N-m</span>
+          </div>
+        </div>
+
+        <!-- Lower Center / Right: ERROR & CALM STATUS COLUMN -->
+        <div class="wb-figma-error-column" id="wbNetLowerErrorCol">
+          <span class="wb-error-icon" id="wbNetErrorIcon">●</span>
+          <span class="wb-error-message" id="wbNetLowerErrorMsg">SYSTEM READY // RF WAVEGUIDE IMPEDANCE 50Ω MATCHED</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: MISSION ACCOMPLISHED DEBRIEF (Desk 03 - Network Department)
+       ========================================================================= -->
+  <div id="modalMissionAccomplishedNet" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window modal-debrief">
+      <div class="modal-header">
+        <div class="modal-badge-title">
+          <span class="modal-dot debrief-dot"></span>
+          <span>MISSION DEBRIEF // NETWORK & TELECOMMUNICATIONS CERTIFICATION</span>
+        </div>
+        <button class="modal-close-btn" id="btnCloseDebriefModalNet" aria-label="Close Modal">&times;</button>
+      </div>
+
+      <div class="modal-content debrief-modal-body">
+        <div class="debrief-banner">
+          <h2 class="debrief-title">QUALIFICATION CERTIFIED: NETWORK SPECIALIST</h2>
+          <p class="debrief-sub">All High-Gain Antenna links and SI-C&DH fiber data channels certified nominal.</p>
+        </div>
+
+        <div class="debrief-stats-grid">
+          <div class="debrief-stat-card">
+            <span class="debrief-stat-lbl">ASSIGNED DIVISION</span>
+            <span class="debrief-stat-val highlight">NETWORK & COMM (DESK 03)</span>
+          </div>
+          <div class="debrief-stat-card">
+            <span class="debrief-stat-lbl">ACTIVE SHIFT TIME</span>
+            <span class="debrief-stat-val" id="debriefDurationNet">00:06:45</span>
+          </div>
+          <div class="debrief-stat-card">
+            <span class="debrief-stat-lbl">OPTICAL ATTENUATION</span>
+            <span class="debrief-stat-val status-green" id="debriefAttenuationNet">&lt; 0.02 dB (GRADE A)</span>
+          </div>
+          <div class="debrief-stat-card">
+            <span class="debrief-stat-lbl">DOWNLINK DATA RATE</span>
+            <span class="debrief-stat-val highlight" id="debriefDataRateNet">4.096 Mbps (100% LOCK)</span>
+          </div>
+        </div>
+
+        <div class="debrief-tasks-list">
+          <div class="debrief-task-row done">
+            <span class="debrief-task-check">✓</span>
+            <span class="debrief-task-desc">[SUB-TSK-N-01] High-Gain Antenna: Fractured coaxial coupler replaced, torqued to 12 N·m, gimbal laser-aligned (±0.5°), and TDRSS carrier locked.</span>
+          </div>
+          <div class="debrief-task-row done">
+            <span class="debrief-task-check">✓</span>
+            <span class="debrief-task-desc">[SUB-TSK-N-02] SI-C&DH Fiber Bus: Sheared silica core stripped, 90° mirror cleaved, sub-micron aligned in V-grooves, arc-fused, and thermal-sleeved.</span>
+          </div>
+          <div class="debrief-task-row done">
+            <span class="debrief-task-check">✓</span>
+            <span class="debrief-task-desc">Phase 3 Comm Check-Out: Full TDRSS Ku-Band satellite constellation loop diagnostic executed and telemetry downlink archived.</span>
+          </div>
+        </div>
+
+        <div class="debrief-actions">
+          <button class="wb3d-btn" id="btnDebriefExploreNet">EXPLORE FACILITY</button>
+          <button class="wb3d-btn primary" id="btnDebriefMainMenuNet">RETURN TO MAIN MENU</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: SCIENCE CAMERA & OPTICAL CLEARANCE TELEMETRY (NASA WFPC2 / COSTAR)
+       ========================================================================= -->
+  <div id="modalScienceCamera" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window modal-science-camera">
+      <div class="modal-header">
+        <div class="modal-badge-title">
+          <span class="modal-dot science-dot"></span>
+          <span>GSFC / STScI OPTICAL TELEMETRY // WFPC2 SCIENCE CHANNEL</span>
+        </div>
+        <div class="science-target-info">
+          <span class="science-hdr-target">TARGET: M100 GRAND SPIRAL (NGC 4321)</span>
+          <span class="science-hdr-coords">RA 12h 22m 54.9s | DEC +15° 49′ 21″ | FILTER: F555W (V-BAND)</span>
+        </div>
+        <button class="modal-close-btn" id="btnCloseScienceCameraModal" aria-label="Close Modal">&times;</button>
+      </div>
+
+      <div class="modal-content science-modal-body">
+        <!-- Left: High-Res Viewport & Image Analysis -->
+        <div class="science-viewport-column">
+          <div class="science-view-controls">
+            <div class="science-mode-toggle">
+              <button class="science-mode-btn active" id="btnScienceModeLive">LIVE TELEMETRY FEED</button>
+              <button class="science-mode-btn" id="btnScienceModeCompare">PRE/POST REPAIR SPLIT</button>
+            </div>
+            <div class="science-channel-pill" id="scienceChannelStatus">
+              FEED STATUS: UNCROSSED ABERRATED
+            </div>
+          </div>
+
+          <div class="science-viewport-display" id="scienceViewportDisplay">
+            <div class="science-img-container" id="scienceImgContainer">
+              <img src="assets/images/hubble_m100_telemetry.svg" alt="Hubble M100 Science Target" class="science-telemetry-img" id="modalScienceTelemetryImg">
+              <div class="science-aberration-halo" id="modalAberrationHalo"></div>
+              <div class="science-crt-scanlines"></div>
+              
+              <!-- Split Comparison Slider (Shown in Compare Mode) -->
+              <div class="science-compare-slider hidden" id="scienceCompareSlider">
+                <div class="science-compare-before">
+                  <span class="compare-tag before">PRE-SERVICING (SPHERICAL ABERRATION 2.2µm)</span>
+                </div>
+                <div class="science-compare-after" id="scienceCompareAfterClip">
+                  <span class="compare-tag after">SERVICED (DIFFRACTION-LIMITED COSTAR/WFPC2)</span>
+                </div>
+                <input type="range" min="0" max="100" value="50" class="compare-range-input" id="scienceRangeSlider" aria-label="Compare Slider">
+                <div class="compare-divider-line" id="scienceDividerLine"></div>
+              </div>
+            </div>
+
+            <!-- Optical Reticle Overlay -->
+            <div class="science-telemetry-reticle">
+              <div class="reticle-scale-bar">
+                <div class="scale-ticks"></div>
+                <span>10 ARCSECONDS (FOV: 2.7' × 2.7')</span>
+              </div>
+              <div class="reticle-wfpc2-badge">WFPC2 CHEVRON APERTURE [F/12.9 - F/28.3]</div>
+            </div>
+          </div>
+
+          <!-- Bottom Live Status Message -->
+          <div class="science-feed-banner" id="scienceFeedBanner">
+            <span class="banner-pulse"></span>
+            <span id="scienceFeedBannerMsg">OPTICAL PATH AFFECTED BY 2.2µm PRIMARY MIRROR SPHERICAL ABERRATION. SUBSYSTEM REPAIRS PENDING.</span>
+          </div>
+        </div>
+
+        <!-- Right: Telemetry Gauges & Subsystem Attribution Matrix -->
+        <div class="science-telemetry-column">
+          <h3 class="science-section-title">WAVEFRONT & POINTING TELEMETRY</h3>
+
+          <!-- Gauges Grid -->
+          <div class="science-gauges-grid">
+            <div class="science-gauge-card">
+              <div class="gauge-card-header">
+                <span class="gauge-name">PSF FWHM (POINT SPREAD)</span>
+                <span class="gauge-target">TARGET: ≤ 0.052"</span>
+              </div>
+              <div class="gauge-main-val" id="gaugeFwhmVal">1.400"</div>
+              <div class="gauge-bar-track">
+                <div class="gauge-bar-fill warning" id="gaugeFwhmFill" style="width: 15%;"></div>
+              </div>
+              <div class="gauge-sub-info" id="gaugeFwhmStatus">CORE LIGHT LOSS: ~85% SCATTERED INTO HALO</div>
+            </div>
+
+            <div class="science-gauge-card">
+              <div class="gauge-card-header">
+                <span class="gauge-name">STREHL RATIO</span>
+                <span class="gauge-target">TARGET: ≥ 0.80</span>
+              </div>
+              <div class="gauge-main-val" id="gaugeStrehlVal">0.120</div>
+              <div class="gauge-bar-track">
+                <div class="gauge-bar-fill alert" id="gaugeStrehlFill" style="width: 12%;"></div>
+              </div>
+              <div class="gauge-sub-info" id="gaugeStrehlStatus">OPTICAL EFFICIENCY SEVERELY COMPROMISED</div>
+            </div>
+
+            <div class="science-gauge-card">
+              <div class="gauge-card-header">
+                <span class="gauge-name">RMS POINTING JITTER</span>
+                <span class="gauge-target">TARGET: ≤ 3.5 mas</span>
+              </div>
+              <div class="gauge-main-val" id="gaugeJitterVal">35.4 mas</div>
+              <div class="gauge-bar-track">
+                <div class="gauge-bar-fill warning" id="gaugeJitterFill" style="width: 25%;"></div>
+              </div>
+              <div class="gauge-sub-info" id="gaugeJitterStatus">GYRO DRIFT & THERMAL SNAP VIBRATION</div>
+            </div>
+
+            <div class="science-gauge-card">
+              <div class="gauge-card-header">
+                <span class="gauge-name">FGS INTERFEROMETRIC LOCK</span>
+                <span class="gauge-target">TARGET: FINE LOCK</span>
+              </div>
+              <div class="gauge-main-val highlight" id="gaugeFgsLockVal">HUNTING / COARSE</div>
+              <div class="gauge-bar-track">
+                <div class="gauge-bar-fill alert" id="gaugeFgsLockFill" style="width: 20%;"></div>
+              </div>
+              <div class="gauge-sub-info" id="gaugeFgsLockStatus">VOLTAGE UNCALIBRATED // INTERFEROMETER UNLOCKED</div>
+            </div>
+          </div>
+
+          <!-- Subsystem Optical Attribution Matrix -->
+          <h3 class="science-section-title">SUBSYSTEM OPTICAL ATTRIBUTION MATRIX</h3>
+          <div class="science-attribution-list">
+            <div class="attribution-row" id="attrGyroRow">
+              <div class="attr-status-icon" id="attrGyroIcon">○</div>
+              <div class="attr-details">
+                <div class="attr-header">
+                  <span class="attr-component">RSU-02 RATE SENSOR GYROS (MECH DEPT)</span>
+                  <span class="attr-weight">ATTRIBUTION: -15.0 mas JITTER</span>
+                </div>
+                <div class="attr-desc">Damps inertial telemetry drift across Pitch/Yaw/Roll coordinate frame.</div>
+              </div>
+            </div>
+
+            <div class="attribution-row" id="attrSadmRow">
+              <div class="attr-status-icon" id="attrSadmIcon">○</div>
+              <div class="attr-details">
+                <div class="attr-header">
+                  <span class="attr-component">SADM SOLAR DRIVE BISTABLE LATCH (MECH DEPT)</span>
+                  <span class="attr-weight">ATTRIBUTION: -10.0 mas JITTER</span>
+                </div>
+                <div class="attr-desc">Eliminates day/night thermal transition boom oscillation and structural torque.</div>
+              </div>
+            </div>
+
+            <div class="attribution-row" id="attrDf224Row">
+              <div class="attr-status-icon" id="attrDf224Icon">○</div>
+              <div class="attr-details">
+                <div class="attr-header">
+                  <span class="attr-component">DF-224 CO-PROCESSOR / PCB (ELEC DEPT)</span>
+                  <span class="attr-weight">ATTRIBUTION: OPTICAL DECONVOLUTION</span>
+                </div>
+                <div class="attr-desc">Provides realtime wavefront telemetry computation and telemetry downlink buffering.</div>
+              </div>
+            </div>
+
+            <div class="attribution-row" id="attrFgsRow">
+              <div class="attr-status-icon" id="attrFgsIcon">○</div>
+              <div class="attr-details">
+                <div class="attr-header">
+                  <span class="attr-component">FINE GUIDANCE SENSOR VOLTAGE (ELEC DEPT)</span>
+                  <span class="attr-weight">ATTRIBUTION: INTERFEROMETER LOCK</span>
+                </div>
+                <div class="attr-desc">Precision 5.00V rail tunes Koesters prism PMTs for sub-arcsecond guide star tracking.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Overall Optical Resolution Summary Box -->
+          <div class="science-summary-box">
+            <div class="summary-metric">
+              <span class="summary-lbl">CURRENT RESOLUTION</span>
+              <span class="summary-val" id="scienceSummaryRes">0.720 arcsec</span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-metric">
+              <span class="summary-lbl">DIFFRACTION LIMIT</span>
+              <span class="summary-val highlight">0.052 arcsec</span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-metric">
+              <span class="summary-lbl">OVERALL CLEARANCE</span>
+              <span class="summary-val" id="scienceSummaryClearance">0.0%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subtle Toast Notification (e.g. for Coffee NIO) -->
+  <div id="toastNIO" class="toast-notification hidden" aria-live="polite">
+    <span class="toast-icon">☕</span>
+    <span id="toastMsg">Hot Coffee. Essential fuel for NASA aerospace apprentices.</span>
+  </div>
+
+  <!-- =========================================================================
+       CONFIRMATION POP-UP (Figma Node 381:273)
+       ========================================================================= -->
+  <div id="confirmationOverlay" class="confirmation-overlay hidden" aria-hidden="true" data-node-id="381:273">
+    <div class="confirmation-modal">
+      <p id="confirmationQuestionText" class="confirmation-question">Confirmation Question?</p>
+      <div class="confirmation-actions">
+        <button id="btnConfirmNo" class="confirm-btn confirm-btn-no">No</button>
+        <button id="btnConfirmYes" class="confirm-btn confirm-btn-yes">YES</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: NASA ASTRONAUT CREDENTIALS & CALL SIGN (Firebase Auth + Profile)
+       ========================================================================= -->
+  <div id="modalAuthProfile" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="facility-modal-window modal-auth-profile">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <span class="modal-dept-badge">GSFC FLIGHT OPERATIONS</span>
+          <h3 class="modal-title">NASA ASTRONAUT CREDENTIALS</h3>
+        </div>
+        <button class="modal-close-btn" id="btnCloseAuthModal" aria-label="Close Credentials Window">&times;</button>
+      </div>
+
+      <div class="modal-body auth-modal-body">
+        <!-- Auth Status Pill -->
+        <div class="auth-status-bar">
+          <div id="authStatusPill" class="auth-status-pill guest">
+            <span class="status-dot yellow"></span> GUEST OPERATOR [CALL SIGN ACTIVE]
+          </div>
+        </div>
+
+        <!-- Section 1: In-Game Call Sign / Player Name -->
+        <div class="auth-section">
+          <h4 class="auth-section-title">1. IN-GAME CALL SIGN (PLAYER NAME)</h4>
+          <p class="auth-section-desc">This name is displayed on your astronaut suit, check-in terminals, and to your co-op friends in multiplayer.</p>
+          <div class="auth-callsign-row">
+            <input type="text" id="authCallSignInput" class="auth-input callsign-input" placeholder="e.g. Commander Parth" maxlength="24" autocomplete="off">
+            <button id="btnSaveCallSign" class="wb3d-btn primary auth-save-btn">SAVE NAME</button>
+          </div>
+        </div>
+
+        <!-- Section 2: Firebase Account Authentication -->
+        <div class="auth-section">
+          <h4 class="auth-section-title">2. CLOUD OPERATOR AUTHENTICATION</h4>
+
+          <!-- User Card (when logged in) -->
+          <div id="authLoggedInCard" class="auth-logged-in-card hidden">
+            <div class="logged-in-meta">
+              <span class="logged-in-label">AUTHENTICATED ACCOUNT</span>
+              <span class="logged-in-email" id="authUserEmail">user@gmail.com</span>
+              <span class="logged-in-uid" id="authUserUid">UID: ...</span>
+            </div>
+            <button id="btnAuthSignOut" class="wb3d-btn auth-signout-btn">SIGN OUT</button>
+          </div>
+
+          <!-- Forms (when not logged in) -->
+          <div id="authFormsContainer" class="auth-forms-container">
+            <!-- 1-Click Google Sign-In -->
+            <button id="btnGoogleSignIn" class="google-signin-btn">
+              <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+              </svg>
+              <span>SIGN IN WITH GOOGLE</span>
+            </button>
+
+            <div class="auth-divider">
+              <span>OR USE GSFC EMAIL / PASSWORD</span>
+            </div>
+
+            <!-- Email & Password Form -->
+            <div class="auth-email-form">
+              <input type="email" id="authEmailInput" class="auth-input" placeholder="astronaut@nasa.gov" autocomplete="email">
+              <input type="password" id="authPasswordInput" class="auth-input" placeholder="PASSWORD (MIN 6 CHARACTERS)" autocomplete="current-password">
+              <div class="auth-btn-row">
+                <button id="btnEmailSignIn" class="wb3d-btn">SIGN IN</button>
+                <button id="btnEmailRegister" class="wb3d-btn primary">REGISTER NEW ACCOUNT</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error / Info Message -->
+          <div id="authErrorMessage" class="auth-error-banner hidden"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Elements -->
+  <audio id="bgMusic" src="assets/audio/Bg-music-calm.mp3" loop preload="auto"></audio>
+  <audio id="clickSfx" src="assets/audio/click-audio-modern.wav" preload="auto"></audio>
+
+    <!-- Firebase App & Analytics SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
+    import { 
+      getAuth, 
+      signInWithPopup, 
+      GoogleAuthProvider, 
+      signInWithEmailAndPassword, 
+      createUserWithEmailAndPassword, 
+      signOut, 
+      onAuthStateChanged,
+      updateProfile 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCD_qbH8p-AOMg6tzRvRl8ZbXGWAwkGG78",
+      authDomain: "game-fce31.firebaseapp.com",
+      projectId: "game-fce31",
+      storageBucket: "game-fce31.firebasestorage.app",
+      messagingSenderId: "1095926654150",
+      appId: "1:1095926654150:web:20f9c4f8d1fcd8f9e4e3c7",
+      measurementId: "G-VFS9QGJXV2"
+    };
+
+    try {
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      window.firebaseApp = app;
+      window.firebaseAnalytics = analytics;
+      const auth = getAuth(app);
+      window.firebaseAuth = auth;
+      window.GoogleAuthProvider = GoogleAuthProvider;
+      window.signInWithPopup = signInWithPopup;
+      window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+      window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+      window.signOut = signOut;
+      window.onAuthStateChanged = onAuthStateChanged;
+      window.updateProfile = updateProfile;
+    } catch (err) {
+      console.warn("Firebase initialized with offline notice:", err);
+    }
+  </script>
+
+  <!-- =========================================================================
+       PHASE 02: ASSEMBLY ACCESS PASSCODE ISSUED MODAL (Figma Node 456:112)
+       ========================================================================= -->
+  <div id="modalAssemblyPasscodeGenerated" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="figma-passcode-popup" data-node-id="456:112">
+      <h2 class="figma-passcode-title">Assembly Access Passcode</h2>
+      <p class="passcode-modal-dept hidden" id="passcodeIssuedDeptTitle">MECHANICAL DEPARTMENT QUALIFIED</p>
+      
+      <div class="figma-passcode-code-display">
+        <span class="figma-code-value" id="passcodeDisplayVal">446523</span>
+        <button class="btn-copy-passcode figma-copy-btn" id="btnCopyPasscode" title="Copy to clipboard">📋 COPY</button>
+      </div>
+
+      <button class="figma-back-btn" id="btnClosePasscodeIssuedModal">Back</button>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       PHASE 02: DEPARTMENT SELECTION FOR ASSEMBLY (Figma Node 456:32)
+       (All Players Accessible - Zero Multiplayer Lockout)
+       ========================================================================= -->
+  <div id="modalAssemblyDeptSelect" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="figma-dept-select-popup" data-node-id="456:32">
+      <h2 class="figma-dept-select-title">Select the Assembly Department</h2>
+
+      <div class="figma-dept-buttons-list">
+        <!-- Mechanical Department Button -->
+        <div class="assembly-select-card figma-dept-row" id="selectCardMech" data-dept="mech">
+          <button class="btn-select-dept figma-dept-bar-btn" id="btnSelectMech" data-dept="mech">
+            <span class="figma-dept-label">Mechanical department</span>
+            <span class="select-card-status figma-dept-status-tag" id="selectStatusMech">READY</span>
+          </button>
+        </div>
+
+        <!-- Electronic Department Button -->
+        <div class="assembly-select-card figma-dept-row" id="selectCardElec" data-dept="elec">
+          <button class="btn-select-dept figma-dept-bar-btn" id="btnSelectElec" data-dept="elec">
+            <span class="figma-dept-label">Electronic Department</span>
+            <span class="select-card-status figma-dept-status-tag" id="selectStatusElec">READY</span>
+          </button>
+        </div>
+
+        <!-- Network Department Button -->
+        <div class="assembly-select-card figma-dept-row" id="selectCardNet" data-dept="net">
+          <button class="btn-select-dept figma-dept-bar-btn" id="btnSelectNet" data-dept="net">
+            <span class="figma-dept-label">Network Department</span>
+            <span class="select-card-status figma-dept-status-tag" id="selectStatusNet">READY</span>
+          </button>
+        </div>
+      </div>
+
+      <button class="figma-back-btn" id="btnCloseAssemblySelect">Back</button>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       PHASE 02: PASSCODE ENTRY & VERIFICATION MODAL (Figma Node 456:81)
+       ========================================================================= -->
+  <div id="modalAssemblyPasscodeInput" class="facility-modal-backdrop hidden" aria-hidden="true">
+    <div class="figma-passcode-entry-popup" data-node-id="456:81">
+      <h2 class="figma-passcode-entry-title">Enter Access Passcode</h2>
+      <p class="passcode-input-dept-subtitle hidden" id="passcodeInputTargetDept">DEPARTMENT: MECHANICAL</p>
+
+      <!-- PIN Display Box (Figma 456:36) -->
+      <div class="figma-pin-display-wrapper">
+        <input type="text" id="assemblyPasscodeInputField" class="figma-pin-display-field" placeholder="------" maxlength="16" autocomplete="off" spellcheck="false">
+        <button class="btn-autofill-passcode figma-autofill-btn" id="btnAutofillPasscode" title="Autofill Passcode">AUTOFILL</button>
+      </div>
+
+      <div class="passcode-error-msg hidden" id="passcodeErrorMsg">INVALID PASSCODE. PLEASE VERIFY DEPARTMENT CLEARANCE.</div>
+
+      <!-- 3x4 Numpad Keypad (Figma 456:81) -->
+      <div class="figma-numpad-grid" id="figmaNumpadGrid">
+        <button type="button" class="figma-numpad-key" data-key="1">1</button>
+        <button type="button" class="figma-numpad-key" data-key="2">2</button>
+        <button type="button" class="figma-numpad-key" data-key="3">3</button>
+
+        <button type="button" class="figma-numpad-key" data-key="4">4</button>
+        <button type="button" class="figma-numpad-key" data-key="5">5</button>
+        <button type="button" class="figma-numpad-key" data-key="6">6</button>
+
+        <button type="button" class="figma-numpad-key" data-key="7">7</button>
+        <button type="button" class="figma-numpad-key" data-key="8">8</button>
+        <button type="button" class="figma-numpad-key" data-key="9">9</button>
+
+        <button type="button" class="figma-numpad-key figma-key-clear" data-key="clear" title="Clear / Backspace">⌫</button>
+        <button type="button" class="figma-numpad-key" data-key="0">0</button>
+        <button type="button" class="figma-numpad-key figma-key-submit btn-passcode-submit" id="btnSubmitAssemblyPasscode" data-key="enter" title="Submit">➔</button>
+      </div>
+
+      <button class="figma-back-btn btn-passcode-back" id="btnBackToDeptSelect">Back</button>
+    </div>
+  </div>
+
+      <!-- =========================================================================
+       PHASE 02: INTERACTIVE ASSEMBLY MINI-GAME OVERLAY
+       ========================================================================= -->
+  <div id="assemblyMiniGameOverlay" class="assembly-minigame-backdrop hidden" aria-hidden="true">
+    <div class="assembly-minigame-container">
+      <header class="minigame-header">
+        <div class="minigame-badge" id="miniGameBadge">PRECISION INTEGRATION CHALLENGE</div>
+        <h3 class="minigame-title" id="miniGameTitle">Subsystem Alignment &amp; Calibration</h3>
+        <p class="minigame-desc" id="miniGameDesc">Align the component to flight tolerances before securing to Hubble.</p>
+      </header>
+
+      <!-- Mini-Game Interactive Viewport -->
+      <div class="minigame-body" id="miniGameBody">
+        <canvas id="miniGameCanvas" width="480" height="280"></canvas>
+        <div class="minigame-readout-bar" id="miniGameReadout">TOLERANCE: --</div>
+      </div>
+
+      <div class="minigame-controls" id="miniGameControls">
+        <!-- Controls dynamically updated per department mini-game -->
+      </div>
+
+      <footer class="minigame-footer">
+        <button class="btn-minigame-abort" id="btnAbortMiniGame">ABORT</button>
+        <button class="btn-minigame-submit" id="btnSubmitMiniGame">CONFIRM &amp; MOUNT COMPONENT</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       PHASE 02 / 03: NASA ENGINEERING DIRECTIVE DECISION MODAL
+       ========================================================================= -->
+  <div id="modalEngineeringDecision" class="decision-modal-backdrop hidden" aria-hidden="true">
+    <div class="decision-modal-container">
+      <header class="decision-modal-header">
+        <div class="decision-header-crest">★ GODDARD SPACE FLIGHT CENTER ★</div>
+        <div class="decision-directive-badge" id="decDirectiveBadge">DIRECTIVE: ENG-M01 // FLIGHT CERTIFICATION</div>
+        <h2 class="decision-title" id="decTitle">Critical Engineering Protocol</h2>
+        <p class="decision-subsystem-label" id="decSubsystem">SUBSYSTEM: RSU-02 GYROSCOPIC CANISTER</p>
+      </header>
+
+      <div class="decision-body">
+        <div class="decision-question-box">
+          <p class="decision-question-text" id="decQuestionText">
+            Execute High-Purity Nitrogen Purge Protocol to evacuate ambient moisture before bolt torque lock?
+          </p>
+        </div>
+
+        <div class="decision-choices-grid">
+          <!-- Option YES -->
+          <div class="decision-choice-card choice-yes" id="cardDecisionYes">
+            <div class="choice-card-header">
+              <span class="choice-tag tag-nominal">FLIGHT NOMINAL</span>
+              <span class="choice-hotkey">[KEY: Y]</span>
+            </div>
+            <h4 class="choice-label" id="decYesLabel">YES — APPROVE PROTOCOL</h4>
+            <p class="choice-desc" id="decYesDesc">Eliminates moisture; zero gyro bearing crystallization in cryogenic LEO orbit.</p>
+            <button type="button" class="btn-decision-choice btn-choice-yes" id="btnDecisionYes">APPROVE &amp; EXECUTE</button>
+          </div>
+
+          <!-- Option NO -->
+          <div class="decision-choice-card choice-no" id="cardDecisionNo">
+            <div class="choice-card-header">
+              <span class="choice-tag tag-risk">EXPEDITE SHORTCUT</span>
+              <span class="choice-hotkey">[KEY: N]</span>
+            </div>
+            <h4 class="choice-label" id="decNoLabel">NO — BYPASS / SHORTCUT</h4>
+            <p class="choice-desc" id="decNoDesc">Saves time, but trapped humidity risks bearing icing and attitude drift in orbit.</p>
+            <button type="button" class="btn-decision-choice btn-choice-no" id="btnDecisionNo">BYPASS PROTOCOL</button>
+          </div>
+        </div>
+
+        <div class="decision-consequence-preview" id="decConsequenceNotice">
+          ⚠️ <strong>NASA FLIGHT WARNING:</strong> Your decisions directly impact Hubble's orbital deployment telemetry and post-mission debriefing.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       PHASE 02: FIGMA NODE 427:2 ASSEMBLY SCREEN (Exact 1:1 Pixel Match)
+       ========================================================================= -->
+  <div id="modalHubbleAssembly" class="facility-modal-backdrop hidden" aria-hidden="true" data-node-id="427:2">
+    <div class="assembly-figma-container">
+      
+      <!-- TOP HEADER BAR (Height: 98px) (Figma: 427:11, 427:19, 427:33, 427:15, 427:23) -->
+      <header class="assembly-figma-topbar">
+        <div class="assembly-figma-brand">Assembly</div>
+        <div class="assembly-figma-title">Hubble  Space telescope</div>
+        <div class="assembly-figma-top-actions">
+          <button id="btnAssemblyRestart" class="assembly-figma-action-btn" title="Reset View" aria-label="Reset View">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+          </button>
+          <button id="btnCloseAssemblyModal" class="assembly-figma-action-btn" title="Close" aria-label="Close Assembly Screen">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- SUB-HEADER BAR (Height: 58px) (Figma: 427:12, 427:47, 427:77) -->
+      <div class="assembly-figma-subheader">
+        <div class="assembly-figma-dept-title" id="assemblyDeptTitle">MECHANICAL DEPARTMENT</div>
+        <button class="assembly-figma-launch-btn" id="btnAssemblyLaunch" title="STS-31 Mission Launch" disabled>Launch</button>
+      </div>
+
+      <!-- MAIN WORKSPACE BODY (Grid: Left 3D Hubble, Right Two Task Cards) -->
+      <main class="assembly-figma-main">
+        <!-- Left: Large Hubble Telescope 3D View & Examine (Figma: 427:25, 434:7) -->
+        <div class="assembly-figma-left-box">
+          <div class="assembly-figma-watermark">Hubble telescope 3d view &amp; examie</div>
+          <canvas id="assemblyTelescopeCanvas"></canvas>
+          <div class="assembly-orbit-hint">DRAG TO ORBIT 360° | SCROLL TO ZOOM</div>
+        </div>
+
+        <!-- Right: Two Task Cards Stacked (Figma: 427:65, 427:67, 434:11, 434:13) -->
+        <div class="assembly-figma-right-box">
+          <!-- Card 1: Task 01 Part of WORKBENCH -->
+          <div class="assembly-figma-task-card" id="assemblyCard1">
+            <div class="assembly-figma-watermark task-watermark" id="assemblyCard1Watermark">Task _01 Part of WORKBECH</div>
+            <div class="assembly-figma-card-canvas-wrap">
+              <canvas id="assemblyPart1Canvas"></canvas>
+            </div>
+            <div class="assembly-figma-card-bottom">
+              <div class="assembly-card-status-text" id="assemblyCard1StatusText">READY FOR INTEGRATION</div>
+              <button class="assembly-figma-assemble-btn" id="btnAssemblePart1">Assemble</button>
+            </div>
+          </div>
+
+          <!-- Card 2: Task 02 Part of WORKBENCH -->
+          <div class="assembly-figma-task-card" id="assemblyCard2">
+            <div class="assembly-figma-watermark task-watermark" id="assemblyCard2Watermark">Task _02 Part of WORKBECH</div>
+            <div class="assembly-figma-card-canvas-wrap">
+              <canvas id="assemblyPart2Canvas"></canvas>
+            </div>
+            <div class="assembly-figma-card-bottom">
+              <div class="assembly-card-status-text" id="assemblyCard2StatusText">READY FOR INTEGRATION</div>
+              <button class="assembly-figma-assemble-btn" id="btnAssemblePart2">Assemble</button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- BOTTOM TELEMETRY BAR (Height: 65px) (Figma: 427:49, 427:51, 427:53, 427:55, 427:57) -->
+      <footer class="assembly-figma-footer">
+        <div class="assembly-telem-group">
+          <span class="assembly-telem-label">MASS</span>
+          <span class="assembly-telem-val" id="telemMassVal">--</span>
+        </div>
+        <div class="assembly-telem-group">
+          <span class="assembly-telem-label">Power</span>
+          <span class="assembly-telem-val" id="telemPowerVal">--</span>
+        </div>
+        <div class="assembly-telem-group">
+          <span class="assembly-telem-label">Data &amp; Transmission  rate</span>
+          <span class="assembly-telem-val" id="telemDataVal">--</span>
+        </div>
+        <div class="assembly-telem-group">
+          <span class="assembly-telem-label">Expenditure</span>
+          <span class="assembly-telem-val" id="telemBudgetVal">--</span>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script src="multiplayerManager.js?v=7.29"></script>
+  <script src="voiceManager.js?v=7.29"></script>
+  <script src="facility3d.js?v=7.29"></script>
+  <script src="workbench3d.js?v=7.29"></script>
+  <script src="sadm3d.js?v=7.29"></script>
+  <script src="electronicsWorkbench3d.js?v=7.29"></script>
+  <script src="networkWorkbench3d.js?v=7.29"></script>
+  <script src="assembly3d.js?v=7.29"></script>
+  <script src="authManager.js?v=7.29"></script>
+  <script src="lobby3d.js?v=7.29"></script>
+  <script src="decisionManager.js?v=7.29"></script>
+  <script src="rocketSimulationEngine.js?v=7.29"></script>
+  <script src="launchSimulation.js?v=7.29"></script>
+  <script src="mobileControls.js?v=7.29"></script>
+  <script src="script.js?v=7.29"></script>
+</body>
+</html>
