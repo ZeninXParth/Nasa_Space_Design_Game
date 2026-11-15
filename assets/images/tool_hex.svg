@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 120" width="80" height="120">
+  <defs>
+    <linearGradient id="hexCopper" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4a2511"/>
+      <stop offset="35%" stop-color="#b86b35"/>
+      <stop offset="65%" stop-color="#e08e53"/>
+      <stop offset="100%" stop-color="#5c2e14"/>
+    </linearGradient>
+    <linearGradient id="handleRubber" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#141416"/>
+      <stop offset="50%" stop-color="#2c2d33"/>
+      <stop offset="100%" stop-color="#0f0f12"/>
+    </linearGradient>
+  </defs>
+  <!-- Ergonomic Aerospace T-Handle / Grip -->
+  <rect x="20" y="10" width="40" height="14" rx="4" fill="url(#handleRubber)"/>
+  <rect x="24" y="13" width="32" height="2" fill="#00f0ff" opacity="0.6"/>
+  <!-- Shaft Collar -->
+  <rect x="36" y="24" width="8" height="6" fill="#3a3c45"/>
+  <!-- Long Hex Shaft -->
+  <rect x="37" y="30" width="6" height="66" fill="url(#hexCopper)"/>
+  <line x1="39" y1="30" x2="39" y2="96" stroke="#f6ad7b" stroke-width="0.8"/>
+  <!-- 5mm Hexagonal Tip -->
+  <polygon points="35,96 45,96 44,112 40,116 36,112" fill="#22242a"/>
+  <polygon points="37,96 43,96 42,110 38,110" fill="#4b5563"/>
+</svg>

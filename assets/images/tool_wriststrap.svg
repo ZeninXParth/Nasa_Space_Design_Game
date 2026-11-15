@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 120" width="80" height="120">
+  <defs>
+    <linearGradient id="strapBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="50%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+    <linearGradient id="metalSnap" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="50%" stop-color="#f1f5f9"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+  </defs>
+  <!-- Elastic Band / Cuff -->
+  <rect x="18" y="14" width="44" height="20" rx="6" fill="url(#strapBlue)"/>
+  <rect x="22" y="17" width="36" height="3" fill="#60a5fa" opacity="0.6"/>
+  <rect x="22" y="28" width="36" height="3" fill="#1e3a8a" opacity="0.6"/>
+  
+  <!-- Snap Connector Base -->
+  <circle cx="40" cy="24" r="7" fill="url(#metalSnap)"/>
+  <circle cx="40" cy="24" r="4" fill="#334155"/>
+  <circle cx="40" cy="24" r="2" fill="#10b981"/>
+  
+  <!-- Coiled Spring Grounding Cord -->
+  <path d="M40 31 
+           C48 35, 48 42, 40 44
+           C32 46, 32 53, 40 55
+           C48 57, 48 64, 40 66
+           C32 68, 32 75, 40 77
+           C48 79, 48 86, 40 88
+           C32 90, 32 97, 40 99" 
+        fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round"/>
+        
+  <!-- Grounding Terminal / Alligator Clip -->
+  <rect x="36" y="99" width="8" height="6" rx="1" fill="#475569"/>
+  <polygon points="34,105 46,105 44,116 36,116" fill="url(#metalSnap)"/>
+  <line x1="38" y1="110" x2="42" y2="110" stroke="#0f172a" stroke-width="1"/>
+  <circle cx="40" cy="113" r="1" fill="#000000"/>
+</svg>

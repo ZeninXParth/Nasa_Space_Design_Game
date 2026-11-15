@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 120" width="80" height="120">
+  <defs>
+    <linearGradient id="gyroMetal" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1e2229"/>
+      <stop offset="30%" stop-color="#3a404d"/>
+      <stop offset="50%" stop-color="#555d6e"/>
+      <stop offset="70%" stop-color="#3a404d"/>
+      <stop offset="100%" stop-color="#14171c"/>
+    </linearGradient>
+    <linearGradient id="gyroGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8a6514"/>
+      <stop offset="40%" stop-color="#d4af37"/>
+      <stop offset="70%" stop-color="#ffd700"/>
+      <stop offset="100%" stop-color="#6e500c"/>
+    </linearGradient>
+  </defs>
+  <!-- Top Connector Ring -->
+  <rect x="34" y="6" width="12" height="8" rx="2" fill="url(#gyroMetal)"/>
+  <!-- Top Dome -->
+  <path d="M22 28 C22 18, 58 18, 58 28 Z" fill="url(#gyroMetal)"/>
+  <ellipse cx="40" cy="28" rx="18" ry="4" fill="#2a2e38"/>
+  <!-- Upper Rotor Housing (Gold Foil) -->
+  <rect x="22" y="28" width="36" height="32" rx="2" fill="url(#gyroGold)"/>
+  <line x1="22" y1="36" x2="58" y2="36" stroke="#5a420b" stroke-width="1"/>
+  <line x1="22" y1="44" x2="58" y2="44" stroke="#5a420b" stroke-width="1"/>
+  <line x1="22" y1="52" x2="58" y2="52" stroke="#5a420b" stroke-width="1"/>
+  <!-- Central Mounting Flange -->
+  <rect x="14" y="60" width="52" height="8" rx="2" fill="url(#gyroMetal)"/>
+  <circle cx="20" cy="64" r="2" fill="#0d0f12"/>
+  <circle cx="60" cy="64" r="2" fill="#0d0f12"/>
+  <!-- Lower Inertia Rotor Chamber -->
+  <rect x="24" y="68" width="32" height="34" rx="2" fill="url(#gyroMetal)"/>
+  <rect x="28" y="74" width="24" height="2" fill="#6b7280"/>
+  <rect x="28" y="86" width="24" height="2" fill="#6b7280"/>
+  <!-- Base Hermetic Plug -->
+  <rect x="30" y="102" width="20" height="8" rx="2" fill="#181a20"/>
+  <circle cx="40" cy="106" r="2.5" fill="#10b981"/>
+</svg>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 120" width="80" height="120">
+  <defs>
+    <linearGradient id="gearSteel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#333842"/>
+      <stop offset="50%" stop-color="#5a6375"/>
+      <stop offset="100%" stop-color="#1f232b"/>
+    </linearGradient>
+    <linearGradient id="gearGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#926715"/>
+      <stop offset="50%" stop-color="#e5b842"/>
+      <stop offset="100%" stop-color="#785009"/>
+    </linearGradient>
+  </defs>
+  <!-- Main Drive Spur Gear -->
+  <circle cx="40" cy="42" r="26" fill="url(#gearSteel)"/>
+  <!-- Gear Teeth -->
+  <path d="M38 12 L42 12 L41 18 L39 18 Z M38 66 L42 66 L41 72 L39 72 Z M12 38 L12 42 L18 41 L18 39 Z M66 38 L66 42 L72 41 L72 39 Z M20 22 L23 19 L27 24 L24 26 Z M57 59 L60 56 L64 61 L61 63 Z M20 62 L23 65 L27 60 L24 58 Z M57 25 L60 22 L64 27 L61 29 Z" fill="#64748b"/>
+  <!-- Gear Web & Hub -->
+  <circle cx="40" cy="42" r="16" fill="#1e2229"/>
+  <circle cx="40" cy="42" r="8" fill="url(#gearGold)"/>
+  <circle cx="40" cy="42" r="4" fill="#0b0d11"/>
+  <!-- Dual Drive Shaft -->
+  <rect x="36" y="68" width="8" height="24" rx="2" fill="url(#gearSteel)"/>
+  <line x1="40" y1="68" x2="40" y2="92" stroke="#94a3b8" stroke-width="1"/>
+  <!-- Deployment Hinge Joint -->
+  <rect x="24" y="92" width="32" height="12" rx="3" fill="#181a20"/>
+  <circle cx="30" cy="98" r="3" fill="#38bdf8"/>
+  <circle cx="50" cy="98" r="3" fill="#38bdf8"/>
+  <!-- Bi-Stem Latch Bracket -->
+  <polygon points="32,104 48,104 44,116 36,116" fill="url(#gearGold)"/>
+</svg>

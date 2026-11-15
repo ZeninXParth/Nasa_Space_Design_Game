@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 120" width="80" height="120">
+  <defs>
+    <linearGradient id="clipTitanium" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2a2e38"/>
+      <stop offset="50%" stop-color="#606677"/>
+      <stop offset="100%" stop-color="#1e222a"/>
+    </linearGradient>
+    <linearGradient id="viscoGel" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+  </defs>
+  <!-- Spring Clamp Arch -->
+  <path d="M24 35 C24 16, 56 16, 56 35 L56 50 C56 54, 50 56, 44 56 L36 56 C30 56, 24 54, 24 50 Z" fill="url(#clipTitanium)"/>
+  <!-- Viscoelastic Cushion Core -->
+  <rect x="28" y="32" width="24" height="20" rx="3" fill="url(#viscoGel)" opacity="0.85"/>
+  <rect x="32" y="36" width="16" height="12" rx="2" fill="#0369a1"/>
+  <!-- Tension Spring Coils -->
+  <rect x="26" y="58" width="28" height="6" rx="2" fill="#475569"/>
+  <circle cx="32" cy="61" r="1.5" fill="#94a3b8"/>
+  <circle cx="48" cy="61" r="1.5" fill="#94a3b8"/>
+  <!-- Hinge Clamp Legs -->
+  <path d="M26 64 L22 92 C22 96, 28 98, 34 98 L34 90 L30 70 Z" fill="url(#clipTitanium)"/>
+  <path d="M54 64 L58 92 C58 96, 52 98, 46 98 L46 90 L50 70 Z" fill="url(#clipTitanium)"/>
+  <!-- Aerospace Lube Tube / Applicator Tip -->
+  <rect x="36" y="78" width="8" height="28" rx="2" fill="#f59e0b"/>
+  <polygon points="38,106 42,106 40,114" fill="#fbbf24"/>
+</svg>

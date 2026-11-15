@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 120" width="80" height="120">
+  <defs>
+    <linearGradient id="tongsSteel" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="35%" stop-color="#94a3b8"/>
+      <stop offset="70%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <linearGradient id="insulatedGrip" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="50%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+  </defs>
+  <!-- Top U-Arch Spring -->
+  <path d="M26 40 C26 12, 54 12, 54 40" fill="none" stroke="url(#tongsSteel)" stroke-width="6" stroke-linecap="round"/>
+  
+  <!-- Insulated Grip Sleeve on U-Arch -->
+  <path d="M30 32 C30 18, 50 18, 50 32" fill="none" stroke="url(#insulatedGrip)" stroke-width="8" stroke-linecap="round"/>
+  <rect x="37" y="16" width="6" height="3" fill="#ffffff" opacity="0.6"/>
+
+  <!-- Left Leg -->
+  <rect x="23" y="38" width="6" height="58" rx="2" fill="url(#tongsSteel)"/>
+  <!-- Left Grip Textured Pad -->
+  <rect x="21" y="48" width="10" height="20" rx="3" fill="#1e293b"/>
+  <line x1="21" y1="53" x2="31" y2="53" stroke="#475569"/>
+  <line x1="21" y1="58" x2="31" y2="58" stroke="#475569"/>
+  <line x1="21" y1="63" x2="31" y2="63" stroke="#475569"/>
+
+  <!-- Right Leg -->
+  <rect x="51" y="38" width="6" height="58" rx="2" fill="url(#tongsSteel)"/>
+  <!-- Right Grip Textured Pad -->
+  <rect x="49" y="48" width="10" height="20" rx="3" fill="#1e293b"/>
+  <line x1="49" y1="53" x2="59" y2="53" stroke="#475569"/>
+  <line x1="49" y1="58" x2="59" y2="58" stroke="#475569"/>
+  <line x1="49" y1="63" x2="59" y2="63" stroke="#475569"/>
+
+  <!-- Inward Hooking PCB Extraction Teeth -->
+  <polygon points="23,96 29,96 35,108 23,108" fill="#cbd5e1"/>
+  <polygon points="29,104 36,104 36,110 32,110" fill="#f8fafc"/>
+
+  <polygon points="57,96 51,96 45,108 57,108" fill="#cbd5e1"/>
+  <polygon points="51,104 44,104 44,110 48,110" fill="#f8fafc"/>
+</svg>

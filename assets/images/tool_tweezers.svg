@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 120" width="80" height="120">
+  <defs>
+    <linearGradient id="tweezersMetal" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="35%" stop-color="#64748b"/>
+      <stop offset="70%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <linearGradient id="tweezersTip" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="50%" stop-color="#f1f5f9"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+  </defs>
+  <!-- Top Joined Base -->
+  <polygon points="34,8 46,8 44,22 36,22" fill="#1e293b"/>
+  <circle cx="40" cy="14" r="2.5" fill="#38bdf8"/>
+
+  <!-- Left Arm with ESD Coating -->
+  <path d="M37 22 C33 45, 30 75, 38 106 L39 116" fill="none" stroke="url(#tweezersMetal)" stroke-width="5" stroke-linecap="round"/>
+  <!-- Right Arm with ESD Coating -->
+  <path d="M43 22 C47 45, 50 75, 42 106 L41 116" fill="none" stroke="url(#tweezersMetal)" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Anti-Static Grip Sleeve (Dark Blue ESD Finish) -->
+  <path d="M36 40 C34 55, 33 68, 35 78" fill="none" stroke="#0284c7" stroke-width="6" stroke-linecap="round"/>
+  <path d="M44 40 C46 55, 47 68, 45 78" fill="none" stroke="#0284c7" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Grip Serrations -->
+  <line x1="33" y1="52" x2="37" y2="52" stroke="#ffffff" opacity="0.6"/>
+  <line x1="33" y1="58" x2="37" y2="58" stroke="#ffffff" opacity="0.6"/>
+  <line x1="33" y1="64" x2="37" y2="64" stroke="#ffffff" opacity="0.6"/>
+
+  <line x1="43" y1="52" x2="47" y2="52" stroke="#ffffff" opacity="0.6"/>
+  <line x1="43" y1="58" x2="47" y2="58" stroke="#ffffff" opacity="0.6"/>
+  <line x1="43" y1="64" x2="47" y2="64" stroke="#ffffff" opacity="0.6"/>
+
+  <!-- Fine Precision Curved Tips -->
+  <polygon points="38,105 40,105 39,118" fill="url(#tweezersTip)"/>
+  <polygon points="42,105 40,105 41,118" fill="url(#tweezersTip)"/>
+</svg>

@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 120" width="80" height="120">
+  <defs>
+    <linearGradient id="kaptonGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#b45309"/>
+      <stop offset="30%" stop-color="#f59e0b"/>
+      <stop offset="60%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#92400e"/>
+    </linearGradient>
+    <linearGradient id="connectorPlastic" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="50%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <!-- Top Locking Connector Header -->
+  <rect x="16" y="8" width="48" height="18" rx="3" fill="url(#connectorPlastic)"/>
+  <rect x="22" y="11" width="36" height="4" fill="#0284c7"/>
+  <!-- Left & Right Snap Release Tabs -->
+  <polygon points="12,12 16,8 16,26 12,22" fill="#fbbf24"/>
+  <polygon points="68,12 64,8 64,26 68,22" fill="#fbbf24"/>
+  
+  <!-- Kapton Amber Ribbon Body -->
+  <rect x="20" y="26" width="40" height="68" fill="url(#kaptonGold)"/>
+  
+  <!-- Parallel Copper Data Conductors -->
+  <line x1="24" y1="26" x2="24" y2="94" stroke="#78350f" stroke-width="1.2"/>
+  <line x1="28" y1="26" x2="28" y2="94" stroke="#78350f" stroke-width="1.2"/>
+  <line x1="32" y1="26" x2="32" y2="94" stroke="#78350f" stroke-width="1.2"/>
+  <line x1="36" y1="26" x2="36" y2="94" stroke="#78350f" stroke-width="1.2"/>
+  <line x1="40" y1="26" x2="40" y2="94" stroke="#78350f" stroke-width="1.2"/>
+  <line x1="44" y1="26" x2="44" y2="94" stroke="#78350f" stroke-width="1.2"/>
+  <line x1="48" y1="26" x2="48" y2="94" stroke="#78350f" stroke-width="1.2"/>
+  <line x1="52" y1="26" x2="52" y2="94" stroke="#78350f" stroke-width="1.2"/>
+  <line x1="56" y1="26" x2="56" y2="94" stroke="#78350f" stroke-width="1.2"/>
+
+  <!-- Lower Terminal Connector Header -->
+  <rect x="16" y="94" width="48" height="18" rx="3" fill="url(#connectorPlastic)"/>
+  <polygon points="12,98 16,94 16,112 12,108" fill="#fbbf24"/>
+  <polygon points="68,98 64,94 64,112 68,108" fill="#fbbf24"/>
+  <circle cx="40" cy="103" r="2.5" fill="#10b981"/>
+</svg>
