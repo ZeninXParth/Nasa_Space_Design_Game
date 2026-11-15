@@ -1,0 +1,9 @@
+--Phase 02----
+Main Screen Player perspective frame UI Update
+Check in UI update
+marketplace UI update
+Workbench (General) UI update
+Game error handling in each department update after implementation
+Department Update instruction
+paper UI for all
+new screen assembly
